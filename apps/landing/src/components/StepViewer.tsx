@@ -40,7 +40,7 @@ export default function StepViewer() {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
+					if (entry.isIntersecting && entry.target instanceof HTMLDivElement) {
 						const index = stepRefs.current.indexOf(entry.target)
 						if (index !== -1) {
 							setActiveStep(index)
