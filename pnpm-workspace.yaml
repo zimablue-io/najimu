@@ -2,6 +2,11 @@ packages:
   - packages/*
   - apps/*
 
+allowBuilds:
+  core-js: false
+  electron: false
+  electron-winstaller: false
+
 ignoredBuiltDependencies:
   - electron
   - electron-winstaller
