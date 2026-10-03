@@ -61,4 +61,4 @@ pnpm build:landing              # Production build
 
 1. **Static site only** - No API calls, no server
 2. **Build copies public/** to dist/
-3. **Vercel Analytics and Speed Insights** - Only on the landing page, not the desktop app. Download clicks call `track('Download click', { platform })`.
+3. **Vercel Analytics and Speed Insights** - Only on the landing page, not the desktop app. Download clicks call `track('Download click', { platform, arch })` and open the stable release asset for that platform.

@@ -1,10 +1,16 @@
 import { track } from '@vercel/analytics'
 import { Download, FileText, Info } from 'lucide-react'
+import { useState } from 'react'
 import { Platform, usePlatform } from '../hooks/usePlatform'
-import { downloadClick, downloadHref } from '../lib/downloads'
+import { DownloadArch, downloadClick, downloadHref } from '../lib/downloads'
 import { GitHubIcon } from './Icons'
 
 type PlatformKey = 'macos' | 'windows' | 'linux'
+
+const macArchLabels: Record<DownloadArch, string> = {
+	arm64: 'Apple silicon',
+	x64: 'Intel',
+}
 
 interface HeroProps {
 	selectedPlatform: Platform | null
@@ -58,9 +64,17 @@ function LocalizedText() {
 
 export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) {
 	const detectedPlatform = usePlatform()
+	const [macArch, setMacArch] = useState<DownloadArch>('arm64')
 	const platform =
 		selectedPlatform ?? ((detectedPlatform !== 'unsupported' ? detectedPlatform : 'macos') as PlatformKey)
 	const isSupported = platform !== 'unsupported'
+	const arch: DownloadArch = platform === 'macos' ? macArch : 'x64'
+	const downloadLabel =
+		platform === 'macos'
+			? `Download for macOS (${macArchLabels[macArch]})`
+			: platform === 'windows' || platform === 'linux'
+				? `Download for ${platformLabels[platform]}`
+				: 'Download'
 
 	return (
 		<section className="min-h-[calc(100vh-80px)] flex items-center px-6 md:px-12 py-16 relative overflow-hidden">
@@ -140,18 +154,37 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 							))}
 						</div>
 
-						{/* Download Button */}
+						{platform === 'macos' && (
+							<div className="flex gap-2" role="group" aria-label="Mac processor">
+								{(Object.keys(macArchLabels) as DownloadArch[]).map((archOption) => (
+									<button
+										key={archOption}
+										type="button"
+										onClick={() => setMacArch(archOption)}
+										aria-pressed={macArch === archOption}
+										className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+											macArch === archOption
+												? 'border-primary text-primary'
+												: 'border-border text-muted-foreground hover:text-foreground'
+										}`}
+									>
+										{macArchLabels[archOption]}
+									</button>
+								))}
+							</div>
+						)}
+
 						{isSupported ? (
 							<a
-								href={downloadHref(platform)}
+								href={downloadHref(platform, arch)}
 								onClick={() => {
-									const event = downloadClick(platform)
+									const event = downloadClick(platform, arch)
 									track(event.name, event.data)
 								}}
 								className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25 animate-glow"
 							>
 								<Download className="w-5 h-5" />
-								Download for {platformLabels[platform]}
+								{downloadLabel}
 							</a>
 						) : (
 							<button

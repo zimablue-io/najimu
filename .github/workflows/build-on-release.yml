@@ -3,6 +3,7 @@ name: Build Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -40,12 +41,12 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF/refs\/tags\//}"
           echo "Tag name is: $TAG_NAME"
-          if [[ "$TAG_NAME" == desktop-* ]]; then
-            VERSION="${TAG_NAME#desktop-}"
-            VERSION="${VERSION#v}"
-          else
-            VERSION="${TAG_NAME#v}"
+          if [[ "$TAG_NAME" != desktop-* ]]; then
+            echo "Build Release only runs on a desktop release tag (got: $TAG_NAME)."
+            exit 1
           fi
+          VERSION="${TAG_NAME#desktop-}"
+          VERSION="${VERSION#v}"
           echo "Syncing version $VERSION to apps/desktop/package.json"
           node -e "
             const fs = require('fs');
@@ -58,6 +59,7 @@ jobs:
         run: pnpm --filter @doclocalizer/desktop electron:build
         env:
           NODE_ENV: production
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v1
@@ -66,6 +68,8 @@ jobs:
             apps/desktop/dist/*.dmg
             apps/desktop/dist/*.exe
             apps/desktop/dist/*.AppImage
+            apps/desktop/dist/*.yml
+            apps/desktop/dist/*.blockmap
           draft: false
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}

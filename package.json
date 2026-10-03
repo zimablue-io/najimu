@@ -11,7 +11,7 @@
 		"apps/*"
 	],
 	"scripts": {
-		"dev:desktop": "pnpm --filter @doclocalizer/desktop tauri dev",
+		"dev:desktop": "pnpm --filter @doclocalizer/desktop dev",
 		"dev:landing": "pnpm --filter @doclocalizer/landing dev",
 		"build:core": "pnpm --filter @doclocalizer/core build",
 		"build:desktop": "pnpm --filter @doclocalizer/desktop build",

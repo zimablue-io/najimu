@@ -17,7 +17,7 @@ We use **Vercel Web Analytics** and **Vercel Speed Insights** to collect anonymi
 - General location (country/region level)
 - Device type and browser information
 - Core Web Vitals (loading, interactivity, and visual stability)
-- A download click, which records only the platform (`macos`, `windows`, or `linux`)
+- A download click, which records only the platform (`macos`, `windows`, or `linux`) and the CPU architecture (`arm64` or `x64`)
 
 This data is anonymized and cannot be used to identify individual users. Document contents are never included.
 

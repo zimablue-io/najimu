@@ -46,7 +46,7 @@ If a build fails or you need to rebuild:
 1. Go to the **Actions** tab on GitHub
 2. Select **Build Release** workflow
 3. Click **Run workflow**
-4. Select the release tag (e.g., `v0.2.0`)
+4. Select the desktop release tag (e.g., `desktop-v0.4.3`). A branch ref is refused.
 
 ## Version Bumping
 
@@ -64,9 +64,12 @@ See [conventionalcommits.org](https://www.conventionalcommits.org/) for full spe
 
 After a successful build, the release includes:
 
-- **macOS**: `.dmg` installer
-- **Windows**: `.exe` (NSIS installer)
-- **Linux**: `.AppImage`
+- **macOS Apple silicon**: `Document-Localizer-mac-arm64.dmg`
+- **macOS Intel**: `Document-Localizer-mac-x64.dmg`
+- **Windows**: `Document-Localizer-win-x64.exe`
+- **Linux**: `Document-Localizer-linux-x86_64.AppImage`
+
+The file names do not include the version, so `releases/latest/download/<file>` keeps working after each release. Builds are unsigned. `CSC_IDENTITY_AUTO_DISCOVERY` is false, and the macOS config sets `identity` to null. `electron-builder` is invoked with `--publish never`; the workflow uploads the artifacts, including the updater metadata.
 
 ## Troubleshooting
 

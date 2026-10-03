@@ -60,7 +60,11 @@ Document Localizer IS:
 
 ## Installation
 
-1. Download the latest release for your platform: https://github.com/zimablue-io/document-localizer/releases/latest
+1. Download the latest release for your platform:
+   - macOS Apple silicon: https://github.com/zimablue-io/document-localizer/releases/latest/download/Document-Localizer-mac-arm64.dmg
+   - macOS Intel: https://github.com/zimablue-io/document-localizer/releases/latest/download/Document-Localizer-mac-x64.dmg
+   - Windows: https://github.com/zimablue-io/document-localizer/releases/latest/download/Document-Localizer-win-x64.exe
+   - Linux: https://github.com/zimablue-io/document-localizer/releases/latest/download/Document-Localizer-linux-x86_64.AppImage
 2. Install a local AI backend:
    - Ollama (recommended): https://ollama.com
    - LM Studio: https://lmstudio.ai

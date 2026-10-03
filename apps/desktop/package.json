@@ -13,13 +13,21 @@
   "build": {
     "appId": "io.doclocalizer.app",
     "productName": "Document Localizer",
+    "artifactName": "Document-Localizer-${os}-${arch}.${ext}",
     "files": [
       "dist/**/*",
       "dist-electron/**/*"
     ],
     "mac": {
+      "identity": null,
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
       ],
       "category": "public.app-category.developer-tools"
     },
@@ -39,7 +47,7 @@
     "dev:web": "vite",
     "build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js",
     "preview": "vite preview",
-    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder"
+    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder --publish never"
   },
   "dependencies": {
     "@doclocalizer/core": "workspace:*",
