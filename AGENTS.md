@@ -70,7 +70,7 @@ pnpm lint:fix             # Format and lint
 - User reviews in diff view, approves/rejects
 - Exports approved as Markdown or PDF
 
-**Landing Page**: Marketing site at zimablue-io.github.io/document-localizer
+**Landing Page**: Marketing site at https://document-localizer.vercel.app
 - Hero with animated demo
 - Features, How It Works, Setup Guide sections
 

@@ -1,5 +1,7 @@
+import { track } from '@vercel/analytics'
 import { Download, FileText, Info } from 'lucide-react'
 import { Platform, usePlatform } from '../hooks/usePlatform'
+import { downloadClick, downloadHref } from '../lib/downloads'
 import { GitHubIcon } from './Icons'
 
 type PlatformKey = 'macos' | 'windows' | 'linux'
@@ -13,12 +15,6 @@ const platformLabels: Record<PlatformKey, string> = {
 	macos: 'macOS',
 	windows: 'Windows',
 	linux: 'Linux',
-}
-
-const platformDownloadUrls: Record<PlatformKey, string> = {
-	macos: 'https://github.com/zimablue-io/document-localizer/releases/latest',
-	windows: 'https://github.com/zimablue-io/document-localizer/releases/latest',
-	linux: 'https://github.com/zimablue-io/document-localizer/releases/latest',
 }
 
 const originalText = 'The color of the car is parked in the garage. Mom made her favorite soccer jersey.'
@@ -147,7 +143,11 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 						{/* Download Button */}
 						{isSupported ? (
 							<a
-								href={platformDownloadUrls[platform]}
+								href={downloadHref(platform)}
+								onClick={() => {
+									const event = downloadClick(platform)
+									track(event.name, event.data)
+								}}
 								className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25 animate-glow"
 							>
 								<Download className="w-5 h-5" />

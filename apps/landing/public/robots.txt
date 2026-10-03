@@ -3,4 +3,4 @@ Allow: /
 Allow: /llms.txt
 Allow: /manifest.webmanifest
 
-Sitemap: https://zimablue-io.github.io/document-localizer/sitemap.xml
+Sitemap: https://document-localizer.vercel.app/sitemap.xml

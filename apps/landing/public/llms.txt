@@ -83,7 +83,7 @@ Primary topics: offline document translation, local LLM translation, privacy-fir
 
 ## Project Information
 
-- **Website**: https://zimablue-io.github.io/document-localizer/
+- **Website**: https://document-localizer.vercel.app/
 - **Repository**: https://github.com/zimablue-io/document-localizer
 - **Issues**: https://github.com/zimablue-io/document-localizer/issues
 - **Releases**: https://github.com/zimablue-io/document-localizer/releases

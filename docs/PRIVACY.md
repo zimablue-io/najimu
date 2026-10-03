@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: April 2026
+Last updated: October 2026
 
 ## Overview
 
@@ -10,14 +10,16 @@ Document Localizer is a desktop application that processes documents entirely on
 
 ### Landing Page (this website)
 
-We use **Vercel Analytics** to collect anonymized, aggregated data about how visitors use this website:
+We use **Vercel Web Analytics** and **Vercel Speed Insights** to collect anonymized, aggregated data about how visitors use this website:
 
 - Pages visited
 - Time spent on pages
 - General location (country/region level)
 - Device type and browser information
+- Core Web Vitals (loading, interactivity, and visual stability)
+- A download click, which records only the platform (`macos`, `windows`, or `linux`)
 
-This data is anonymized and cannot be used to identify individual users.
+This data is anonymized and cannot be used to identify individual users. Document contents are never included.
 
 ### Desktop Application
 

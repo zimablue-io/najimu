@@ -1,4 +1,4 @@
-import { Briefcase, Code, BookOpen, Shield, FileText, Zap } from 'lucide-react'
+import { BookOpen, Briefcase, Code, FileText, Shield, Zap } from 'lucide-react'
 
 const useCases = [
 	{
@@ -52,7 +52,8 @@ export default function UseCases() {
 				<div className="text-center mb-16">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the Use Cases That Matter</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						Whether you're translating sensitive legal documents, developer manuals, or full book manuscripts — Document Localizer keeps your data local and your output professional.
+						Whether you're translating sensitive legal documents, developer manuals, or full book
+						manuscripts — Document Localizer keeps your data local and your output professional.
 					</p>
 				</div>
 
