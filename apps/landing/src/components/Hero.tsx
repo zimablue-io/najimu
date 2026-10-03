@@ -24,8 +24,8 @@ const platformLabels: Record<PlatformKey, string> = {
 	linux: 'Linux',
 }
 
-const originalText = 'The color of the car is parked in the garage. Mom made her favorite soccer jersey.'
-const localizedText = 'The colour of the car is parked in the garage. Mum made her favourite football jersey.'
+const originalText = 'Mom parked the car. Her favorite color is on the soccer jersey.'
+const localizedText = 'Mum parked the car. Her favourite colour is on the football jersey.'
 
 const changedOriginal = ['color', 'Mom', 'favorite', 'soccer']
 const changedLocalized = ['colour', 'Mum', 'favourite', 'football']
@@ -91,51 +91,11 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 				<div className="space-y-4 md:space-y-6 text-center md:text-left">
 					<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
 						<span className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
-							Localize PDFs &amp; Markdown with AI
+							Localize PDFs and Markdown on your machine
 						</span>
-						<br />
-						<span className="text-foreground">100% Offline, 100% Private</span>
 					</h1>
 					<p className="text-lg md:text-xl text-muted-foreground">
-						Free offline document translator between 100+ locales. Runs entirely on your machine using
-						Ollama, LM Studio, or llama.cpp - no cloud, no API keys, no data leaving your computer.
-					</p>
-					<p className="text-muted-foreground max-w-md mx-auto md:mx-0">
-						Perfect for English variants (US, UK, AU, CA, IN), Spanish (ES, MX, AR), Portuguese (PT, BR),
-						French (FR, CA), German (DE, AT, CH), and 90+ more locales. Free for personal use.
-					</p>
-
-					<nav
-						aria-label="Page sections"
-						className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 text-sm pt-1"
-					>
-						<a href="#features" className="text-primary hover:underline">
-							Features
-						</a>
-						<span className="text-muted-foreground" aria-hidden="true">
-							&middot;
-						</span>
-						<a href="#how-it-works" className="text-primary hover:underline">
-							How It Works
-						</a>
-						<span className="text-muted-foreground" aria-hidden="true">
-							&middot;
-						</span>
-						<a href="#setup" className="text-primary hover:underline">
-							Setup Guide
-						</a>
-					</nav>
-
-					<p className="text-xs text-muted-foreground">
-						Open source on{' '}
-						<a
-							href="https://github.com/zimablue-io/document-localizer"
-							className="text-primary hover:underline"
-							rel="noopener"
-						>
-							GitHub
-						</a>
-						. Free for personal use.
+						A private translator for 100+ locales. Your files stay on this computer.
 					</p>
 
 					<div className="flex flex-col gap-3 pt-4">
@@ -208,6 +168,9 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 							<GitHubIcon className="w-5 h-5" />
 							View on GitHub
 						</a>
+						<p className="text-xs text-muted-foreground text-center md:text-left">
+							Open source. Free for personal use.
+						</p>
 					</div>
 				</div>
 
