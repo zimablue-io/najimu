@@ -109,37 +109,35 @@ describe('buildPrompt', () => {
 })
 
 describe('integration: prompt building for multiple paragraphs', () => {
-	beforeEach(() => {
-		vi.clearAllMocks()
-	})
+	it('keeps the same locale text when each paragraph replaces {text}', () => {
+		const paragraphs = [
+			'The harbour was quiet.',
+			'A second paragraph with "quotes", accents àéï, and 你好.',
+			`Long ${'paragraph '.repeat(60)}end.`,
+		]
+		expect(paragraphs[2]?.length).toBeGreaterThan(500)
 
-	it('should build consistent prompt prefix for all paragraphs', () => {
-		const promptTemplate =
-			'Translate from {sourceLocale} to {targetLocale}.\n\n---BEGIN TEXT---\n{text}\n---END TEXT---'
-
-		// Build prefix once
-		const prefix = buildPrompt(promptTemplate, {
+		const basePrompt = buildPrompt(DEFAULT_LOCALIZATION_PROMPT, {
 			sourceLocale: 'en-US',
 			targetLocale: 'de-DE',
-			text: '', // Empty - just for prefix
+			text: '{text}',
 		})
-		const promptWithoutText = prefix.replace(/\n---BEGIN TEXT---\n---END TEXT---\n*$/, '')
+		expect(basePrompt).toContain('{text}')
+		expect(basePrompt).not.toContain('{sourceLocale}')
+		expect(basePrompt).not.toContain('{targetLocale}')
 
-		// Build content for multiple paragraphs
-		const paragraph1Content = `${promptWithoutText}\n\n---BEGIN TEXT---\nHello world\n---END TEXT---`
-		const paragraph2Content = `${promptWithoutText}\n\n---BEGIN TEXT---\nGoodbye world\n---END TEXT---`
+		const contents = paragraphs.map((paragraph) => basePrompt.replace('{text}', paragraph))
+		const enUSCounts = contents.map((content) => content.match(/en-US/g)?.length)
+		const deDECounts = contents.map((content) => content.match(/de-DE/g)?.length)
+		expect(new Set(enUSCounts).size).toBe(1)
+		expect(new Set(deDECounts).size).toBe(1)
 
-		// Both should have the same locale instructions
-		expect(paragraph1Content).toContain('en-US')
-		expect(paragraph1Content).toContain('de-DE')
-		expect(paragraph2Content).toContain('en-US')
-		expect(paragraph2Content).toContain('de-DE')
-
-		// Neither should have unfilled placeholders
-		expect(paragraph1Content).not.toContain('{sourceLocale}')
-		expect(paragraph1Content).not.toContain('{targetLocale}')
-		expect(paragraph2Content).not.toContain('{sourceLocale}')
-		expect(paragraph2Content).not.toContain('{targetLocale}')
+		for (const [index, content] of contents.entries()) {
+			expect(content).toContain(paragraphs[index])
+			expect(content).not.toContain('{text}')
+			expect(content).not.toContain('{sourceLocale}')
+			expect(content).not.toContain('{targetLocale}')
+		}
 	})
 
 	it('should handle locale with hyphens like de-DE', () => {
