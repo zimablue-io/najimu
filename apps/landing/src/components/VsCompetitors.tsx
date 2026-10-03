@@ -3,7 +3,7 @@ import { DollarSign, FileText, Lock, Shield, Zap } from 'lucide-react'
 const features = [
 	{
 		label: 'Data Privacy',
-		localizer: 'Full local processing — zero data leaves your machine',
+		localizer: 'Document text stays on your machine',
 		deepl: 'Cloud-only — documents sent to DeepL servers',
 		google: 'Cloud-only — documents sent to Google servers',
 		localizerIcon: Lock,
@@ -12,7 +12,7 @@ const features = [
 	},
 	{
 		label: 'Cost',
-		localizer: 'Free & open source — run on your own hardware',
+		localizer: 'Personal use is free. Commercial use needs a license',
 		deepl: 'Subscription-based pricing, per-user fees',
 		google: 'Pay-per-use pricing model',
 		localizerIcon: DollarSign,
@@ -47,8 +47,8 @@ const features = [
 		competitorColor: 'text-red-500',
 	},
 	{
-		label: 'Air-Gapped',
-		localizer: 'Works 100% offline — no internet required',
+		label: 'Offline translation',
+		localizer: 'Translation runs without an internet connection',
 		deepl: 'Requires cloud connection',
 		google: 'Requires cloud connection',
 		localizerIcon: Shield,

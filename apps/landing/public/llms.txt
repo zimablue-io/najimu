@@ -9,9 +9,9 @@ Transforms PDF and Markdown documents between locales (languages and regional va
 ## Core Features
 
 - **Locale Selection**: 100+ locales covering English, Spanish, Portuguese, French, German, Italian, Chinese, Japanese, Korean, Arabic, Hindi, and many more
-- **Privacy-First Local Translation**: All processing happens locally via Ollama, LM Studio, or llama.cpp - no cloud API calls, no telemetry, no data collection
+- **Privacy-First Local Translation**: Document text is processed locally via Ollama, LM Studio, or llama.cpp. The app does not upload documents or run product analytics. A Commercial license check sends the key to Polar, and update checks contact GitHub
 - **PDF and Markdown Support**: Read PDFs and Markdown files, output to PDF or Markdown
-- **Diff Review**: Side-by-side comparison view with paragraph-level approve or reject before export
+- **Diff Review**: Side-by-side comparison with paragraph editing, then approve or reject the document before export
 - **OpenAI-Compatible**: Works with any local model exposing an OpenAI-compatible API (Llama 3, Mistral, Phi, Gemma, Qwen, and more)
 - **Cross-Platform**: macOS, Windows, and Linux
 
@@ -19,9 +19,9 @@ Transforms PDF and Markdown documents between locales (languages and regional va
 
 1. **Content Localization**: Convert documentation, marketing copy, and product pages for international audiences
 2. **Regional Adaptation**: Transform content between regional variants (en-US to en-GB, es-ES to es-MX, fr-FR to fr-CA)
-3. **Privacy-Sensitive Translation**: Translate confidential documents (legal, medical, financial) without sending data to third-party APIs
-4. **Offline Workflows**: Translate documents on air-gapped machines or in restricted-network environments
-5. **Cost-Free Translation**: Avoid per-character cloud translation costs by running local models
+3. **Privacy-Sensitive Translation**: Translate confidential documents (legal, medical, financial) without sending document text to a translation API
+4. **Offline Workflows**: Translate documents without an internet connection
+5. **Local Models**: Run the model on your own hardware. Personal use has no per-character translation fee
 6. **Publishing Preparation**: Adapt content for specific regional markets before publication
 
 ## Technical Specifications
@@ -41,11 +41,11 @@ Transforms PDF and Markdown documents between locales (languages and regional va
 Document Localizer vs. Cloud Translators (DeepL, Google Translate, Microsoft Translator):
 
 - **Data Privacy**: All processing happens locally on your GPU. Your documents never leave your machine. Cloud translators send every document to their servers.
-- **Cost**: Free and open source. Run on your own hardware. Cloud translators charge $7–$31/month per user with per-character billing.
+- **Cost**: Personal use is free. Commercial use requires a Document Localizer Commercial license. Cloud translators charge per user or per character.
 - **Formatting Retention**: Preserves markdown, code blocks, tables, and layout structure. Cloud translators often break complex layouts and code formatting.
 - **Custom Models**: Plug in any OpenAI-compatible local LLM (Llama 3, Mistral, Gemma, Qwen, etc.). Cloud translators offer black-box models with zero customization.
-- **Diff & Review**: Built-in side-by-side diff editor lets you review and approve translations paragraph-by-paragraph before export. Cloud translators give you raw output with no review workflow.
-- **Air-Gapped**: Works 100% offline with no internet connection required. Cloud translators require a constant connection.
+- **Diff & Review**: Built-in side-by-side diff editor lets you edit a paragraph, then approve or reject the document before export. Cloud translators give you raw output with no review workflow.
+- **Offline translation**: Document translation runs without an internet connection. A Commercial license check and update checks use the network and do not send document text. Cloud translators require a constant connection.
 
 Document Localizer is NOT:
 - A CAT tool (Computer-Assisted Translation, like Trados or memoQ) - it is a fully automated AI translator
@@ -78,7 +78,7 @@ Document Localizer IS:
 1. **Upload**: Select PDF or Markdown files to add to your source library
 2. **Configure**: Choose source locale and target locale
 3. **Process**: AI localizes content in chunks locally via the selected backend
-4. **Review**: Side-by-side diff view shows changes with paragraph-level accept or reject
+4. **Review**: Side-by-side diff view shows changes. Edit a paragraph, then approve or reject the document
 5. **Export**: Export the approved document as Markdown or PDF
 
 ## Keywords and Topic Clusters
@@ -96,4 +96,4 @@ Primary topics: offline document translation, local LLM translation, privacy-fir
 
 ## Licensing
 
-Copyright (c) 2026 zimablue-io. Free for personal and non-commercial use. Commercial use requires written permission. Full license details in LICENSE.md at the repository root.
+Copyright (c) 2026 zimablue-io. Free for personal and non-commercial use. Commercial use requires a Document Localizer Commercial license issued by zimablue-io. Full license details in LICENSE.md at the repository root.

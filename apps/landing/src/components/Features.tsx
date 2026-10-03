@@ -6,7 +6,7 @@ const features = [
 		icon: Shield,
 		title: 'Private',
 		description:
-			'Nothing leaves your device. Translation runs entirely on your local machine via Ollama, LM Studio, or llama.cpp - no cloud APIs, no telemetry, no data collection.',
+			'Document text stays on your machine and goes only to the local model you run. The app does not upload documents or run product analytics. A Commercial license check sends the key to Polar, and update checks contact GitHub.',
 	},
 	{
 		icon: Brain,
@@ -18,7 +18,7 @@ const features = [
 		icon: GitCompare,
 		title: 'You Control',
 		description:
-			'Review every change with side-by-side diff before export. Approve or reject each paragraph individually - your document, your call.',
+			'Review every change in a side-by-side diff, edit any paragraph, then approve or reject the document before you export.',
 	},
 	{
 		icon: FileText,

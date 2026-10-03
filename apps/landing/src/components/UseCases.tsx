@@ -26,7 +26,7 @@ const useCases = [
 		icon: Briefcase,
 		title: 'Enterprise Internal Docs',
 		description:
-			'Localize internal wikis, SOPs, and training materials. Fully air-gapped — runs on your GPU, behind your firewall, with zero data leaving your network.',
+			'Localize internal wikis, SOPs, and training materials. Translation runs on your GPU, and document text stays on your network.',
 		color: 'text-amber-500',
 	},
 	{

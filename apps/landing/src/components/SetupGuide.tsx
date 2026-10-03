@@ -302,7 +302,8 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 								</span>
 							</summary>
 							<p className="mt-2 text-sm text-muted-foreground">
-								Yes. Document Localizer is free for personal and non-commercial use. See the{' '}
+								Personal and non-commercial use is free. Commercial use requires a Document Localizer
+								Commercial license. See the{' '}
 								<a
 									href="https://github.com/zimablue-io/document-localizer/blob/main/LICENSE.md"
 									className="text-primary hover:underline"
@@ -323,9 +324,8 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 								</span>
 							</summary>
 							<p className="mt-2 text-sm text-muted-foreground">
-								No. All processing happens locally on your machine via your chosen AI backend (Ollama,
-								LM Studio, or llama.cpp). The app never makes outbound network requests for your
-								document content.
+								No. Document text is processed only by the local AI backend you choose (Ollama, LM
+								Studio, or llama.cpp). License checks and update checks do not include document text.
 							</p>
 						</details>
 						<details className="group bg-card rounded-lg border border-border p-4">

@@ -20,7 +20,7 @@ const steps: Step[] = [
 		title: 'Monitor & Review',
 		image: '/images/step 2 - tasks.png',
 		description:
-			'Track processing progress with real-time status updates. When processing completes, click "Review" to inspect changes in a side-by-side diff view with paragraph-level editing, approve/reject controls.',
+			'Track processing progress. When processing completes, click Review to inspect changes, edit a paragraph, then approve or reject the document.',
 	},
 	{
 		id: '3',
