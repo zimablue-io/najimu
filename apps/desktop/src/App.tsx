@@ -9,12 +9,18 @@ import Header from './components/Header'
 import HistoryPanel from './components/HistoryPanel'
 import SettingsModal from './components/SettingsModal'
 import { useDocuments } from './hooks/useDocuments'
-import { contentToDocx, contentToPdf, ExportFormat, getFileExtension } from './lib/export'
+import { type AuditEvent, applyReview, pairsFromApproval } from './lib/audit'
+import { planBatch } from './lib/batch'
+import { isPolarHttpsUrl, parseCommercialCatalog } from './lib/commercial'
+import { contentToDocx, contentToPdf, type ExportFormat, getFileExtension } from './lib/export'
+import { parseGlossary, renderTermsBlock, termsForLocale } from './lib/glossary'
+import { decideLicense } from './lib/license'
 import { ALL_LOCALES } from './lib/locales'
+import { type MemoryEntry, parseMemory, rememberPairs } from './lib/memory'
 import { createProcessingOutput, extractMarkdown, processDocument } from './lib/processing'
 import { LOCALE_DETECTION_PROMPT } from './lib/prompts'
 import { loadSettings } from './lib/settings'
-import type { HistoryEntry, Settings } from './lib/types'
+import type { HistoryEntry, Settings, SourceDocument } from './lib/types'
 import { formatError } from './lib/utils'
 
 export default function App() {
@@ -36,6 +42,8 @@ export default function App() {
 	} = useDocuments()
 
 	const [settings, setSettings] = useState<Settings | null>(null)
+	const [entitled, setEntitled] = useState(false)
+	const [checkoutUrl, setCheckoutUrl] = useState('')
 	const [selectedOutputId, setSelectedOutputId] = useState<string | null>(null)
 	const [showSettings, setShowSettings] = useState(false)
 	const [settingsTab, setSettingsTab] = useState<string>('locales')
@@ -73,6 +81,36 @@ export default function App() {
 	useEffect(() => {
 		void loadSettings().then(setSettings)
 	}, [])
+
+	const refreshLicense = useCallback(async () => {
+		const [rawCatalog, probe] = await Promise.all([
+			window.electron.commercialCatalog(),
+			window.electron.licenseStatus(),
+		])
+		const catalog = parseCommercialCatalog(rawCatalog)
+		setCheckoutUrl(catalog.checkoutCommercial)
+		const decision = decideLicense({
+			now: new Date(),
+			commercialBenefitId: catalog.commercialBenefitId,
+			response: probe.response,
+			networkError: probe.networkError,
+			cache: probe.cache,
+		})
+		setEntitled(decision.entitled)
+	}, [])
+
+	useEffect(() => {
+		void refreshLicense()
+	}, [refreshLicense])
+
+	const openBuy = useCallback(() => {
+		if (isPolarHttpsUrl(checkoutUrl)) {
+			void window.electron.openExternal(checkoutUrl)
+			return
+		}
+		setSettingsTab('commercial')
+		setShowSettings(true)
+	}, [checkoutUrl])
 
 	// Load app version on mount
 	useEffect(() => {
@@ -126,6 +164,179 @@ export default function App() {
 		}
 	}, [addSourceDocs])
 
+	const detectSourceLocale = useCallback(
+		async (markdown: string): Promise<string> => {
+			if (!settings) return ''
+			const prompt = LOCALE_DETECTION_PROMPT.replace('{text}', markdown.slice(0, 1000))
+			const result = await window.electron.generateAI({
+				url: `${settings.apiUrl}/chat/completions`,
+				body: {
+					model: activeModelName,
+					messages: [{ role: 'user', content: prompt }],
+					temperature: 0.2,
+					max_tokens: 50,
+					stream: false,
+				},
+			})
+			return result.content?.trim() || ''
+		},
+		[settings, activeModelName]
+	)
+
+	const recordAudit = useCallback(
+		async (event: AuditEvent) => {
+			if (!entitled) return true
+			return window.electron.appendAudit(event)
+		},
+		[entitled]
+	)
+
+	const runProcess = useCallback(
+		async (
+			sourceDoc: SourceDocument,
+			sourceLocale: string,
+			targetLocale: string,
+			abortController: AbortController
+		) => {
+			if (!settings) return
+
+			const newOutput = createProcessingOutput(sourceDoc, targetLocale)
+			setTasksDocs((prev) => [...prev, newOutput])
+			toast.info(`Processing ${sourceDoc.name} to ${targetLocale}...`)
+
+			let historyEntry: Awaited<ReturnType<typeof window.electron.addHistory>> | undefined
+			try {
+				historyEntry = await window.electron.addHistory({
+					fileName: sourceDoc.name,
+					filePath: sourceDoc.path,
+					sourceLocale,
+					targetLocale,
+					processedAt: new Date().toISOString(),
+					status: 'processed',
+				})
+			} catch (err) {
+				toast.error(`Failed to create history entry: ${formatError(err)}`)
+				return
+			}
+
+			let glossaryCount = 0
+			try {
+				let termsBlock: string | undefined
+				let memory: MemoryEntry[] | undefined
+				if (entitled) {
+					const [glossaryRaw, memoryRaw] = await Promise.all([
+						window.electron.loadGlossary(),
+						window.electron.loadMemory(),
+					])
+					const terms = termsForLocale(parseGlossary(glossaryRaw), sourceLocale, targetLocale)
+					const block = renderTermsBlock(terms)
+					termsBlock = block.length > 0 ? block : undefined
+					memory = parseMemory(memoryRaw)
+					glossaryCount = terms.length
+					const started = await recordAudit({
+						time: new Date().toISOString(),
+						type: 'process_started',
+						documentId: newOutput.id,
+						documentName: newOutput.name,
+						sourceLocale,
+						targetLocale,
+						model: activeModelName || undefined,
+						promptId: settings.activePromptId,
+						glossaryCount,
+					})
+					if (!started) toast.error('Could not record the start of this run')
+				}
+
+				const result = await processDocument({
+					sourceDoc,
+					apiUrl: settings.apiUrl,
+					model: activeModelName,
+					customPrompt: activePrompt,
+					sourceLocale,
+					targetLocale,
+					termsBlock,
+					memory,
+					shouldContinue: () => !abortController.signal.aborted,
+					onStatusChange: (status, progress) => {
+						setTasksDocs((prev) =>
+							prev.map((d) => (d.id === newOutput.id ? { ...d, status, progress } : d))
+						)
+					},
+					onProgress: (current, total) => {
+						setTasksDocs((prev) =>
+							prev.map((d) =>
+								d.id === newOutput.id ? { ...d, progress: { current, total, phase: 'localizing' } } : d
+							)
+						)
+					},
+					onIntermediateWrite: async (text) => {
+						await window.electron.writeTextFile(newOutput.path, text)
+					},
+				})
+
+				if (!result.success) return
+
+				setTasksDocs((prev) =>
+					prev.map((d) =>
+						d.id === newOutput.id
+							? {
+									...d,
+									status: 'review',
+									localizedText: result.localizedText,
+									markdown: result.markdown,
+									progress: undefined,
+									memoryHits: result.memoryHits,
+									glossaryCount,
+								}
+							: d
+					)
+				)
+				toast.success(`${sourceDoc.name} processed to ${targetLocale}`)
+
+				if (entitled) {
+					const finished = await recordAudit({
+						time: new Date().toISOString(),
+						type: 'process_finished',
+						documentId: newOutput.id,
+						documentName: newOutput.name,
+						sourceLocale,
+						targetLocale,
+						model: activeModelName || undefined,
+						promptId: settings.activePromptId,
+						glossaryCount,
+						memoryHits: result.memoryHits,
+					})
+					if (!finished) toast.error('Could not record the finished run')
+				}
+
+				if (historyEntry?.id) {
+					await window.electron.updateHistory(historyEntry.id, {
+						status: 'review',
+						chunksProcessed: result.paragraphsProcessed,
+					})
+				}
+			} catch (err) {
+				const cleanError = formatError(err)
+				if (cleanError === 'cancelled') return
+
+				setTasksDocs((prev) =>
+					prev.map((d) =>
+						d.id === newOutput.id ? { ...d, status: 'error', error: cleanError, progress: undefined } : d
+					)
+				)
+				toast.error(`Failed to process ${sourceDoc.name}: ${cleanError}`)
+
+				if (historyEntry?.id) {
+					await window.electron.updateHistory(historyEntry.id, {
+						status: 'error',
+						errorMessage: cleanError,
+					})
+				}
+			}
+		},
+		[settings, entitled, activeModelName, activePrompt, setTasksDocs, recordAudit]
+	)
+
 	const handleProcess = useCallback(
 		async (sourceDocId: string) => {
 			const sourceDoc = sourceDocs.find((d) => d.id === sourceDocId)
@@ -148,133 +359,26 @@ export default function App() {
 				return
 			}
 
-			// Create abort controller EARLY so stop can work during locale detection
 			const abortController = new AbortController()
 			abortControllers.current.set(sourceDocId, abortController)
 
-			// Detect locale before processing
-			const markdown = await extractMarkdown(sourceDoc)
-			const sampleText = markdown.slice(0, 1000) // Sample first 1000 chars
+			let detectedLocale = ''
+			try {
+				detectedLocale = await detectSourceLocale(await extractMarkdown(sourceDoc))
+			} catch (err) {
+				abortControllers.current.delete(sourceDocId)
+				toast.error(`Failed to read ${sourceDoc.name}: ${formatError(err)}`)
+				return
+			}
 
-			// Use AI to detect locale
-			const prompt = LOCALE_DETECTION_PROMPT.replace('{text}', sampleText)
-			const result = await window.electron.generateAI({
-				url: `${settings.apiUrl}/chat/completions`,
-				body: {
-					model: activeModelName,
-					messages: [{ role: 'user', content: prompt }],
-					temperature: 0.2,
-					max_tokens: 50,
-					stream: false,
-				},
-			})
-
-			const detectedLocale = result.content?.trim() || ''
-
-			// If detected locale differs from selected source locale, prompt confirmation
 			if (detectedLocale && detectedLocale !== 'unknown' && detectedLocale !== sourceLocale) {
 				setPendingLocaleCheck({ sourceDocId, detectedLocale, sourceLocale, targetLocale })
 				return
 			}
 
-			// Proceed with processing
-			if (!settings) return
-
-			const newOutput = createProcessingOutput(sourceDoc, targetLocale)
-			setTasksDocs((prev) => [...prev, newOutput])
-			toast.info(`Processing ${sourceDoc.name} to ${targetLocale}...`)
-
-			let historyEntry: Awaited<ReturnType<typeof window.electron.addHistory>> | undefined
-			try {
-				historyEntry = await window.electron.addHistory({
-					fileName: sourceDoc.name,
-					filePath: sourceDoc.path,
-					sourceLocale,
-					targetLocale,
-					processedAt: new Date().toISOString(),
-					status: 'processed',
-				})
-			} catch (err) {
-				toast.error(`Failed to create history entry: ${formatError(err)}`)
-				return
-			}
-
-			try {
-				const result = await processDocument({
-					sourceDoc,
-					apiUrl: settings.apiUrl,
-					model: activeModelName,
-					customPrompt: activePrompt,
-					sourceLocale,
-					targetLocale,
-					shouldContinue: () => !abortController.signal.aborted,
-					onStatusChange: (status, progress) => {
-						setTasksDocs((prev) =>
-							prev.map((d) => (d.id === newOutput.id ? { ...d, status, progress } : d))
-						)
-					},
-					onProgress: (current, total) => {
-						setTasksDocs((prev) =>
-							prev.map((d) =>
-								d.id === newOutput.id ? { ...d, progress: { current, total, phase: 'localizing' } } : d
-							)
-						)
-					},
-					onIntermediateWrite: async (text) => {
-						await window.electron.writeTextFile(newOutput.path, text)
-					},
-				})
-
-				// If cancelled/stopped, don't update UI or show success
-				if (!result.success) {
-					return
-				}
-
-				setTasksDocs((prev) =>
-					prev.map((d) =>
-						d.id === newOutput.id
-							? {
-									...d,
-									status: 'review',
-									localizedText: result.localizedText,
-									markdown: result.markdown,
-									progress: undefined,
-								}
-							: d
-					)
-				)
-				toast.success(`${sourceDoc.name} processed to ${targetLocale}`)
-
-				if (historyEntry?.id) {
-					await window.electron.updateHistory(historyEntry.id, {
-						status: 'review',
-						chunksProcessed: result.paragraphsProcessed,
-					})
-				}
-			} catch (err) {
-				const cleanError = formatError(err)
-
-				// 'cancelled' means user stopped - task already removed, nothing to do
-				if (cleanError === 'cancelled') {
-					return
-				}
-
-				setTasksDocs((prev) =>
-					prev.map((d) =>
-						d.id === newOutput.id ? { ...d, status: 'error', error: cleanError, progress: undefined } : d
-					)
-				)
-				toast.error(`Failed to process ${sourceDoc.name}: ${cleanError}`)
-
-				if (historyEntry?.id) {
-					await window.electron.updateHistory(historyEntry.id, {
-						status: 'error',
-						errorMessage: cleanError,
-					})
-				}
-			}
+			await runProcess(sourceDoc, sourceLocale, targetLocale, abortController)
 		},
-		[sourceDocs, settings, isConfigured, activeModelName, activePrompt, setTasksDocs]
+		[sourceDocs, settings, isConfigured, detectSourceLocale, runProcess]
 	)
 
 	const handleConfirmLocaleMismatch = useCallback(async () => {
@@ -288,105 +392,55 @@ export default function App() {
 		const targetLocale = sourceDoc.targetLocale
 		if (!targetLocale) return
 
-		// Reuse or create abort controller keyed by sourceDocId
 		let abortController = abortControllers.current.get(sourceDocId)
 		if (!abortController) {
 			abortController = new AbortController()
 			abortControllers.current.set(sourceDocId, abortController)
 		}
 
-		const newOutput = createProcessingOutput(sourceDoc, targetLocale)
-		setTasksDocs((prev) => [...prev, newOutput])
-		toast.info(`Processing ${sourceDoc.name} to ${targetLocale}...`)
+		await runProcess(sourceDoc, sourceLocale, targetLocale, abortController)
+	}, [pendingLocaleCheck, sourceDocs, settings, runProcess])
 
-		let historyEntry: Awaited<ReturnType<typeof window.electron.addHistory>> | undefined
-		try {
-			historyEntry = await window.electron.addHistory({
-				fileName: sourceDoc.name,
-				filePath: sourceDoc.path,
-				sourceLocale,
-				targetLocale,
-				processedAt: new Date().toISOString(),
-				status: 'processed',
-			})
-		} catch (err) {
-			toast.error(`Failed to create history entry: ${formatError(err)}`)
-			return
-		}
+	const handleProcessBatch = useCallback(
+		async (documentIds: string[], targetLocales: string[]) => {
+			if (!entitled) return
+			if (!settings || !isConfigured) {
+				toast.error('Please configure API URL and model in settings')
+				setShowSettings(true)
+				return
+			}
 
-		try {
-			const result = await processDocument({
-				sourceDoc,
-				apiUrl: settings.apiUrl,
-				model: activeModelName,
-				customPrompt: activePrompt,
-				sourceLocale,
-				targetLocale,
-				shouldContinue: () => !abortController.signal.aborted,
-				onStatusChange: (status, progress) => {
-					setTasksDocs((prev) => prev.map((d) => (d.id === newOutput.id ? { ...d, status, progress } : d)))
-				},
-				onProgress: (current, total) => {
-					setTasksDocs((prev) =>
-						prev.map((d) =>
-							d.id === newOutput.id ? { ...d, progress: { current, total, phase: 'localizing' } } : d
-						)
+			const pairs = planBatch({ entitled: true, documentIds, targetLocales })
+			for (const pair of pairs) {
+				const sourceDoc = sourceDocs.find((d) => d.id === pair.documentId)
+				if (!sourceDoc) continue
+				if (!sourceDoc.sourceLocale) {
+					toast.error(`Set a source locale for ${sourceDoc.name}`)
+					continue
+				}
+
+				let detectedLocale = ''
+				try {
+					detectedLocale = await detectSourceLocale(await extractMarkdown(sourceDoc))
+				} catch (err) {
+					toast.error(`Failed to read ${sourceDoc.name}: ${formatError(err)}`)
+					continue
+				}
+				if (detectedLocale && detectedLocale !== 'unknown' && detectedLocale !== sourceDoc.sourceLocale) {
+					toast.error(
+						`${sourceDoc.name}: detected ${detectedLocale}, source locale is ${sourceDoc.sourceLocale}. Skipped.`
 					)
-				},
-				onIntermediateWrite: async (text) => {
-					await window.electron.writeTextFile(newOutput.path, text)
-				},
-			})
+					continue
+				}
 
-			// If cancelled/stopped, don't update UI or show success
-			if (!result.success) {
-				return
+				const abortController = new AbortController()
+				abortControllers.current.set(sourceDoc.id, abortController)
+				await runProcess(sourceDoc, sourceDoc.sourceLocale, pair.targetLocale, abortController)
+				if (abortController.signal.aborted) break
 			}
-
-			setTasksDocs((prev) =>
-				prev.map((d) =>
-					d.id === newOutput.id
-						? {
-								...d,
-								status: 'review',
-								localizedText: result.localizedText,
-								markdown: result.markdown,
-								progress: undefined,
-							}
-						: d
-				)
-			)
-			toast.success(`${sourceDoc.name} processed to ${targetLocale}`)
-
-			if (historyEntry?.id) {
-				await window.electron.updateHistory(historyEntry.id, {
-					status: 'review',
-					chunksProcessed: result.paragraphsProcessed,
-				})
-			}
-		} catch (err) {
-			const cleanError = formatError(err)
-
-			// 'cancelled' means user stopped - task already removed, nothing to do
-			if (cleanError === 'cancelled') {
-				return
-			}
-
-			setTasksDocs((prev) =>
-				prev.map((d) =>
-					d.id === newOutput.id ? { ...d, status: 'error', error: cleanError, progress: undefined } : d
-				)
-			)
-			toast.error(`Failed to process ${sourceDoc.name}: ${cleanError}`)
-
-			if (historyEntry?.id) {
-				await window.electron.updateHistory(historyEntry.id, {
-					status: 'error',
-					errorMessage: cleanError,
-				})
-			}
-		}
-	}, [pendingLocaleCheck, sourceDocs, settings, activeModelName, activePrompt, setTasksDocs])
+		},
+		[entitled, settings, isConfigured, sourceDocs, detectSourceLocale, runProcess]
+	)
 
 	const handleStop = useCallback(
 		(id: string) => {
@@ -418,6 +472,42 @@ export default function App() {
 		const output = tasksDocs.find((d) => d.id === selectedOutputId)
 		if (!output) return
 
+		if (entitled) {
+			if (output.markdown && output.localizedText) {
+				const saved = await window.electron.saveMemory(
+					rememberPairs(
+						parseMemory(await window.electron.loadMemory()),
+						pairsFromApproval(
+							output.markdown,
+							output.localizedText,
+							output.sourceLocale,
+							output.targetLocale
+						)
+					)
+				)
+				if (!saved) {
+					toast.error('Could not save translation memory')
+					return
+				}
+			}
+			const recorded = await recordAudit({
+				time: new Date().toISOString(),
+				type: 'approved',
+				documentId: output.id,
+				documentName: output.name,
+				sourceLocale: output.sourceLocale,
+				targetLocale: output.targetLocale,
+				model: activeModelName || undefined,
+				promptId: settings?.activePromptId,
+				glossaryCount: output.glossaryCount,
+				memoryHits: output.memoryHits,
+			})
+			if (!recorded) {
+				toast.error('Could not record the approval')
+				return
+			}
+		}
+
 		setTasksDocs((prev) => prev.filter((d) => d.id !== selectedOutputId))
 		setProcessedDocs((prev) => [...prev, { ...output, status: 'approved' as const }])
 		setSelectedOutputId(null)
@@ -429,11 +519,38 @@ export default function App() {
 			await window.electron.updateHistory(entry.id, { status: 'approved' })
 			updateHistory((await window.electron.getHistory()) as HistoryEntry[])
 		}
-	}, [selectedOutputId, tasksDocs, updateHistory, setTasksDocs, setProcessedDocs])
+	}, [
+		selectedOutputId,
+		tasksDocs,
+		entitled,
+		recordAudit,
+		activeModelName,
+		settings?.activePromptId,
+		updateHistory,
+		setTasksDocs,
+		setProcessedDocs,
+	])
 
 	const handleReject = useCallback(async () => {
 		const output = tasksDocs.find((d) => d.id === selectedOutputId)
 		if (!output) return
+
+		if (entitled) {
+			const recorded = await recordAudit({
+				time: new Date().toISOString(),
+				type: 'rejected',
+				documentId: output.id,
+				documentName: output.name,
+				sourceLocale: output.sourceLocale,
+				targetLocale: output.targetLocale,
+				model: activeModelName || undefined,
+				promptId: settings?.activePromptId,
+			})
+			if (!recorded) {
+				toast.error('Could not record the rejection')
+				return
+			}
+		}
 
 		setTasksDocs((prev) => prev.filter((d) => d.id !== selectedOutputId))
 		setProcessedDocs((prev) => [...prev, { ...output, status: 'rejected' as const }])
@@ -446,26 +563,72 @@ export default function App() {
 			await window.electron.updateHistory(entry.id, { status: 'rejected' })
 			updateHistory((await window.electron.getHistory()) as HistoryEntry[])
 		}
-	}, [selectedOutputId, tasksDocs, updateHistory, setTasksDocs, setProcessedDocs])
+	}, [
+		selectedOutputId,
+		tasksDocs,
+		entitled,
+		recordAudit,
+		activeModelName,
+		settings?.activePromptId,
+		updateHistory,
+		setTasksDocs,
+		setProcessedDocs,
+	])
+
+	const handleReviewDecision = useCallback(
+		async (decision: 'confirmed' | 'returned', reviewerName: string) => {
+			if (!entitled) return
+			const output =
+				processedDocs.find((d) => d.id === selectedOutputId) ?? tasksDocs.find((d) => d.id === selectedOutputId)
+			if (!output || reviewerName.trim().length === 0) return
+
+			const applied = applyReview({
+				id: output.id,
+				name: output.name,
+				sourceLocale: output.sourceLocale,
+				targetLocale: output.targetLocale,
+				decision,
+				reviewerName: reviewerName.trim(),
+				now: new Date().toISOString(),
+			})
+			const recorded = await recordAudit(applied.event)
+			if (!recorded) {
+				toast.error('Could not record the review')
+				return
+			}
+
+			if (decision === 'returned') {
+				const returned = { ...output, status: applied.status, review: applied.review }
+				setProcessedDocs((prev) => prev.filter((d) => d.id !== output.id))
+				setTasksDocs((prev) => [...prev.filter((d) => d.id !== output.id), returned])
+				toast.success('Returned for another pass')
+			} else {
+				setProcessedDocs((prev) =>
+					prev.map((d) =>
+						d.id === output.id ? { ...d, status: 'approved' as const, review: applied.review } : d
+					)
+				)
+				toast.success('Review confirmed')
+			}
+			setSelectedOutputId(null)
+		},
+		[entitled, processedDocs, tasksDocs, selectedOutputId, recordAudit, setProcessedDocs, setTasksDocs]
+	)
 
 	const handleUpdateLocalizedText = useCallback(
 		(paragraphIndex: number, newText: string) => {
-			setTasksDocs((prev) =>
-				prev.map((d) => {
+			const apply = <T extends { id: string; localizedText?: string }>(docs: T[]) =>
+				docs.map((d) => {
 					if (d.id !== selectedOutputId) return d
-
 					const paragraphs = (d.localizedText || '').split(/\n\n+/)
 					paragraphs[paragraphIndex] = newText
-
-					return {
-						...d,
-						localizedText: paragraphs.join('\n\n'),
-					}
+					return { ...d, localizedText: paragraphs.join('\n\n') }
 				})
-			)
+			setTasksDocs(apply)
+			setProcessedDocs(apply)
 			toast.success('Paragraph updated')
 		},
-		[selectedOutputId, setTasksDocs]
+		[selectedOutputId, setTasksDocs, setProcessedDocs]
 	)
 
 	const handleExport = useCallback(
@@ -511,15 +674,42 @@ export default function App() {
 				} else {
 					await window.electron.writeTextFile(savePath, output.localizedText)
 				}
+				const markExported = <T extends { id: string; status: string }>(docs: T[]) =>
+					docs.map((d) => (d.id === id ? { ...d, status: 'exported' as const } : d))
+				setTasksDocs(markExported)
+				setProcessedDocs(markExported)
 				toast.success(`Exported to ${savePath}`)
+				if (entitled) {
+					const recorded = await recordAudit({
+						time: new Date().toISOString(),
+						type: 'exported',
+						documentId: output.id,
+						documentName: output.name,
+						sourceLocale: output.sourceLocale,
+						targetLocale: output.targetLocale,
+						model: activeModelName || undefined,
+						promptId: settings?.activePromptId,
+					})
+					if (!recorded) toast.error('Could not record the export')
+				}
 			} catch (err) {
 				toast.error(`Export failed: ${formatError(err)}`)
 			}
 		},
-		[tasksDocs, processedDocs]
+		[
+			tasksDocs,
+			processedDocs,
+			entitled,
+			recordAudit,
+			activeModelName,
+			settings?.activePromptId,
+			setTasksDocs,
+			setProcessedDocs,
+		]
 	)
 
-	const selectedOutput = tasksDocs.find((d) => d.id === selectedOutputId)
+	const selectedOutput =
+		tasksDocs.find((d) => d.id === selectedOutputId) ?? processedDocs.find((d) => d.id === selectedOutputId)
 
 	// Loading state
 	if (isLoading) {
@@ -559,6 +749,7 @@ export default function App() {
 					setSettings((prev) => (prev ? { ...prev, activePromptId: promptId } : null))
 				}
 				onCheckForUpdates={handleCheckForUpdates}
+				commercial={entitled}
 			/>
 
 			<main className="flex-1 p-6 overflow-auto">
@@ -569,6 +760,10 @@ export default function App() {
 						onReject={handleReject}
 						onBack={() => setSelectedOutputId(null)}
 						onUpdateLocalizedText={handleUpdateLocalizedText}
+						commercial={entitled}
+						onConfirmReview={(reviewerName) => void handleReviewDecision('confirmed', reviewerName)}
+						onReturnReview={(reviewerName) => void handleReviewDecision('returned', reviewerName)}
+						onBuy={openBuy}
 					/>
 				)}
 
@@ -600,6 +795,12 @@ export default function App() {
 						onLocaleChange={(id, source, target) => {
 							updateSourceLocales(id, source, target)
 						}}
+						commercial={entitled}
+						onBuy={openBuy}
+						onProcessBatch={(documentIds, targetLocales) =>
+							void handleProcessBatch(documentIds, targetLocales)
+						}
+						onSignOff={setSelectedOutputId}
 					/>
 				)}
 			</main>
@@ -612,6 +813,7 @@ export default function App() {
 					onClose={() => setShowSettings(false)}
 					onPromptListRefresh={handlePromptListRefresh}
 					onModelsRefresh={handleModelsRefresh}
+					onCommercialChanged={() => void refreshLicense()}
 				/>
 			)}
 
@@ -631,29 +833,6 @@ export default function App() {
 							Document appears to be in <strong>{pendingLocaleCheck.detectedLocale}</strong>, but you
 							selected <strong>{pendingLocaleCheck.sourceLocale}</strong> as the source locale.
 						</p>
-						{pendingLocaleCheck.detectedLocale === pendingLocaleCheck.sourceLocale && (
-							<div className="flex items-start gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg mb-4">
-								<svg
-									className="w-5 h-5 text-orange-500 shrink-0 mt-0.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-									/>
-								</svg>
-								<div>
-									<p className="text-sm font-medium text-orange-500">Same locale selected</p>
-									<p className="text-xs text-orange-500/80 mt-0.5">
-										Ensure you have a custom prompt configured to define the transformation
-									</p>
-								</div>
-							</div>
-						)}
 						<p className="text-sm text-muted-foreground mb-6">
 							This may result in unnecessary processing if the document is already in your selected
 							locale.

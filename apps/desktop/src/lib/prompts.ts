@@ -26,7 +26,7 @@ Locale code:`
 
 export function buildPrompt(
 	template: string,
-	params: { sourceLocale?: string; targetLocale?: string; text: string }
+	params: { sourceLocale?: string; targetLocale?: string; text: string; termsBlock?: string }
 ): string {
 	if (!params.sourceLocale || !params.targetLocale) {
 		console.warn('buildPrompt called without locale values', {
@@ -36,10 +36,13 @@ export function buildPrompt(
 			hasTargetPlaceholder: template.includes('{targetLocale}'),
 		})
 	}
-	return template
+	const prompt = template
 		.replace(/{sourceLocale}/g, params.sourceLocale || '')
 		.replace(/{targetLocale}/g, params.targetLocale || '')
 		.replace('{text}', params.text)
+	const terms = params.termsBlock?.trim()
+	if (!terms) return prompt
+	return `TERMS:\n${terms}\n\n${prompt}`
 }
 
 const REQUIRED_PROMPT_VARS = ['{sourceLocale}', '{targetLocale}', '{text}'] as const

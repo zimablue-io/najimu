@@ -1,7 +1,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const distDir = path.join(__dirname, '..', 'dist-electron')
+const distDir = path.join(__dirname, '..', 'dist-electron', 'electron')
 
 // Rename main.js to main.cjs
 const mainJs = path.join(distDir, 'main.js')

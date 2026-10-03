@@ -4,7 +4,7 @@
   "description": "AI-powered document localization for privacy-conscious teams",
   "author": "zimablue-io",
   "license": "SEE LICENSE IN ../../LICENSE.md",
-  "main": "dist-electron/main.cjs",
+  "main": "dist-electron/electron/main.cjs",
   "publish": {
     "provider": "github",
     "owner": "zimablue-io",
@@ -47,7 +47,7 @@
     "dev:web": "vite",
     "build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js",
     "preview": "vite preview",
-    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder --publish never"
+    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && node ../../scripts/polar-catalog.js --copy-if-present && electron-builder --publish never"
   },
   "dependencies": {
     "@doclocalizer/core": "workspace:*",

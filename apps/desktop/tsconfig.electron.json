@@ -4,11 +4,18 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "dist-electron",
-    "rootDir": "electron",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["electron/**/*"]
+  "include": [
+    "electron/**/*",
+    "src/lib/commercial.ts",
+    "src/lib/license.ts",
+    "src/lib/audit.ts",
+    "src/lib/glossary.ts",
+    "src/lib/memory.ts"
+  ]
 }

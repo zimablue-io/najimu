@@ -29,6 +29,12 @@ workspace/.batch-status.json
 
 # Secrets
 .env
+.env.*
+!.env.example
+
+# Polar catalog for this organization. Public ids, still not for the public repo.
+apps/desktop/commercial.public.json
+.polar-cli/
 
 # Build outputs
 dist/

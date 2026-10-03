@@ -20,6 +20,7 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
 		"test": "vitest run",
+		"polar:catalog": "node scripts/polar-catalog.js",
 		"knip": "knip",
 		"knip:fix": "knip --fix",
 		"prepare": "husky"

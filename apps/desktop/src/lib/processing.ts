@@ -4,6 +4,7 @@
 import { convertPdfToMarkdown } from '@doclocalizer/core'
 import { DISK_WRITE_INTERVAL, PROCESSING_CONCURRENCY } from './config'
 import { getOutputFileName, getOutputPath, isPdfPath, readPdfFile, readTextFile } from './files'
+import { lookupMemory, type MemoryEntry } from './memory'
 import { buildPrompt, validatePromptTemplate } from './prompts'
 import type { ProcessingOutput, SourceDocument } from './types'
 
@@ -16,6 +17,7 @@ export interface ProcessingResult {
 	markdown?: string
 	error?: string
 	paragraphsProcessed?: number
+	memoryHits?: number
 }
 
 /**
@@ -28,6 +30,8 @@ export interface ProcessingOptions {
 	customPrompt?: string
 	sourceLocale: string
 	targetLocale: string
+	termsBlock?: string
+	memory?: MemoryEntry[]
 	shouldContinue?: () => boolean
 	onStatusChange: (status: ProcessingOutput['status'], progress?: { current: number; total: number }) => void
 	onProgress: (current: number, total: number) => void
@@ -125,6 +129,8 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 		customPrompt,
 		sourceLocale,
 		targetLocale,
+		termsBlock,
+		memory,
 		shouldContinue,
 		onStatusChange,
 		onProgress,
@@ -172,9 +178,11 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 		sourceLocale,
 		targetLocale,
 		text: '{text}', // Keep as placeholder to be replaced per paragraph
+		termsBlock,
 	})
 
 	const localizedParagraphs: string[] = []
+	let memoryHits = 0
 
 	// Process in parallel batches
 	for (let i = 0; i < paragraphs.length; i += PROCESSING_CONCURRENCY) {
@@ -185,17 +193,21 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 
 		const batch = paragraphs.slice(i, i + PROCESSING_CONCURRENCY)
 
-		// Replace {text} placeholder with actual paragraph (simple string operation per paragraph)
-		const contents = batch.map((p) => basePrompt.replace('{text}', p))
-
 		const results = await Promise.all(
-			contents.map((content) =>
-				processParagraph({
+			batch.map(async (paragraph) => {
+				if (memory) {
+					const hit = lookupMemory(memory, sourceLocale, targetLocale, paragraph)
+					if (hit !== null) {
+						memoryHits += 1
+						return hit
+					}
+				}
+				return processParagraph({
 					apiUrl,
 					model,
-					content,
+					content: basePrompt.replace('{text}', paragraph),
 				})
-			)
+			})
 		)
 
 		localizedParagraphs.push(...results)
@@ -220,6 +232,7 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 		localizedText: finalText,
 		markdown,
 		paragraphsProcessed: paragraphs.length,
+		memoryHits,
 	}
 }
 

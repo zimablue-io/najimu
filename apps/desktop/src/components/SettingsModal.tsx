@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ALL_LOCALES } from '../lib/locales'
 import { DEFAULT_LOCALIZATION_PROMPT } from '../lib/prompts'
 import type { ModelConfig, Settings } from '../lib/types'
+import { CommercialPanel } from './CommercialPanel'
 import { PromptCreateForm } from './PromptCreateForm'
 import { PromptEditor } from './PromptEditor'
 import { PromptList } from './PromptList'
@@ -15,6 +16,7 @@ interface SettingsModalProps {
 	onClose: () => void
 	onPromptListRefresh?: (promptId?: string) => void
 	onModelsRefresh?: () => void
+	onCommercialChanged?: () => void
 }
 
 export default function SettingsModal({
@@ -24,6 +26,7 @@ export default function SettingsModal({
 	onClose,
 	onPromptListRefresh,
 	onModelsRefresh,
+	onCommercialChanged,
 }: SettingsModalProps) {
 	const [activeTab, setActiveTab] = useState<string>(initialTab)
 	const [localeSearch, setLocaleSearch] = useState('')
@@ -238,6 +241,7 @@ export default function SettingsModal({
 						<TabsTrigger value="api">API</TabsTrigger>
 						<TabsTrigger value="prompts">Prompts</TabsTrigger>
 						<TabsTrigger value="processing">Processing</TabsTrigger>
+						<TabsTrigger value="commercial">Commercial</TabsTrigger>
 					</TabsList>
 
 					<ScrollArea className="flex-1 min-h-0 mt-4">
@@ -496,6 +500,10 @@ export default function SettingsModal({
 								/>
 								<p className="text-xs text-muted-foreground">Characters to overlap between chunks</p>
 							</div>
+						</TabsContent>
+
+						<TabsContent value="commercial">
+							<CommercialPanel onChanged={() => onCommercialChanged?.()} />
 						</TabsContent>
 					</ScrollArea>
 				</Tabs>

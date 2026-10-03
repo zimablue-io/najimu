@@ -15,6 +15,10 @@ interface DiffViewProps {
 	onReject: () => void
 	onBack: () => void
 	onUpdateLocalizedText?: (paragraphIndex: number, newText: string) => void
+	commercial?: boolean
+	onConfirmReview?: (reviewerName: string) => void
+	onReturnReview?: (reviewerName: string) => void
+	onBuy?: () => void
 }
 
 type ViewMode = 'side-by-side' | 'list'
@@ -108,9 +112,14 @@ export default function DiffViewComponent({
 	onReject,
 	onBack,
 	onUpdateLocalizedText,
+	commercial = false,
+	onConfirmReview,
+	onReturnReview,
+	onBuy,
 }: DiffViewProps) {
 	const [viewMode, setViewMode] = useState<ViewMode>('side-by-side')
 	const [editingParagraph, setEditingParagraph] = useState<EditState | null>(null)
+	const [reviewerName, setReviewerName] = useState('')
 
 	const originalText = document.markdown || ''
 	const localizedText = document.localizedText || ''
@@ -195,14 +204,47 @@ export default function DiffViewComponent({
 						</Button>
 					</div>
 
-					<Button variant="outline" onClick={onReject}>
-						<X className="w-4 h-4 mr-1" />
-						Reject
-					</Button>
-					<Button onClick={onApprove}>
-						<Check className="w-4 h-4 mr-1" />
-						Approve All
-					</Button>
+					{document.status === 'approved' || document.status === 'exported' ? (
+						commercial ? (
+							<>
+								<input
+									aria-label="Reviewer name"
+									value={reviewerName}
+									onChange={(event) => setReviewerName(event.target.value)}
+									placeholder="Reviewer name"
+									className="bg-background border border-border rounded-md px-2 py-1 text-sm w-40"
+								/>
+								<Button
+									variant="outline"
+									disabled={reviewerName.trim().length === 0}
+									onClick={() => onReturnReview?.(reviewerName.trim())}
+								>
+									Return
+								</Button>
+								<Button
+									disabled={reviewerName.trim().length === 0}
+									onClick={() => onConfirmReview?.(reviewerName.trim())}
+								>
+									Confirm
+								</Button>
+							</>
+						) : (
+							<Button variant="outline" onClick={onBuy}>
+								Buy Commercial
+							</Button>
+						)
+					) : (
+						<>
+							<Button variant="outline" onClick={onReject}>
+								<X className="w-4 h-4 mr-1" />
+								Reject
+							</Button>
+							<Button onClick={onApprove}>
+								<Check className="w-4 h-4 mr-1" />
+								Approve All
+							</Button>
+						</>
+					)}
 				</div>
 			</div>
 
@@ -331,14 +373,6 @@ export default function DiffViewComponent({
 												/>
 											</div>
 										</div>
-									</div>
-									<div className="p-4 border-t border-border/50 flex items-center gap-2 bg-[#1a1a1f]">
-										<Button size="sm" variant="default">
-											Approve
-										</Button>
-										<Button size="sm" variant="outline">
-											Reject
-										</Button>
 									</div>
 								</div>
 							))}

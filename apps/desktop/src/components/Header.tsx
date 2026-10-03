@@ -58,6 +58,7 @@ interface HeaderProps {
 	onModelChange?: (modelId: string) => void
 	onPromptChange?: (promptId: string) => void
 	onCheckForUpdates?: () => void
+	commercial?: boolean
 }
 
 export default function Header({
@@ -77,6 +78,7 @@ export default function Header({
 	onModelChange,
 	onPromptChange,
 	onCheckForUpdates,
+	commercial = false,
 }: HeaderProps) {
 	const processingCount = 0
 	const [showModelDropdown, setShowModelDropdown] = useState(false)
@@ -106,6 +108,13 @@ export default function Header({
 		<header className="border-b border-border px-6 py-4 flex items-center justify-between">
 			<div className="flex items-center gap-4">
 				<h1 className="text-xl font-semibold">Document Localizer</h1>
+				<button
+					type="button"
+					onClick={() => onOpenSettingsTab?.('commercial')}
+					className="px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80"
+				>
+					{commercial ? 'Commercial' : 'Free'}
+				</button>
 
 				{/* Model Dropdown */}
 				{models && models.length > 0 ? (

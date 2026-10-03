@@ -42,6 +42,10 @@ interface DocumentListProps {
 	onFilesAdded?: (paths: string[]) => void
 	onExport?: (id: string, format: 'md' | 'pdf' | 'doc') => void
 	onLocaleChange?: (id: string, source?: string, target?: string) => void
+	commercial?: boolean
+	onBuy?: () => void
+	onProcessBatch?: (documentIds: string[], targetLocales: string[]) => void
+	onSignOff?: (id: string) => void
 }
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
@@ -83,10 +87,16 @@ export default function DocumentList({
 	onFilesAdded,
 	onExport,
 	onLocaleChange,
+	commercial = false,
+	onBuy,
+	onProcessBatch,
+	onSignOff,
 }: DocumentListProps) {
 	const [isDragging, setIsDragging] = useState(false)
 	const [showExportMenu, setShowExportMenu] = useState<string | null>(null)
 	const [activeTab, setActiveTab] = useState<'uploaded' | 'tasks' | 'processed'>('uploaded')
+	const [selectedIds, setSelectedIds] = useState<string[]>([])
+	const [batchLocales, setBatchLocales] = useState<string[]>([])
 	const exportMenuRef = useRef<HTMLDivElement>(null)
 
 	const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -211,6 +221,41 @@ export default function DocumentList({
 				)}
 
 				{activeTab === 'uploaded' && sourceDocs.length > 0 && (
+					<div className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-border p-3">
+						<span className="text-sm font-medium">Batch</span>
+						{locales?.map((locale) => (
+							<label key={locale.code} className="flex items-center gap-1 text-sm">
+								<input
+									type="checkbox"
+									disabled={!commercial}
+									checked={batchLocales.includes(locale.code)}
+									onChange={() =>
+										setBatchLocales((current) =>
+											current.includes(locale.code)
+												? current.filter((code) => code !== locale.code)
+												: [...current, locale.code]
+										)
+									}
+								/>
+								{locale.code}
+							</label>
+						))}
+						<Button
+							size="sm"
+							disabled={!commercial || selectedIds.length === 0 || batchLocales.length === 0}
+							onClick={() => onProcessBatch?.(selectedIds, batchLocales)}
+						>
+							Process batch
+						</Button>
+						{!commercial && (
+							<Button size="sm" variant="outline" onClick={onBuy}>
+								Buy Commercial
+							</Button>
+						)}
+					</div>
+				)}
+
+				{activeTab === 'uploaded' && sourceDocs.length > 0 && (
 					<table className="w-full">
 						<thead className="sticky top-0 bg-background z-10">
 							<tr className="border-b border-border text-left">
@@ -228,7 +273,22 @@ export default function DocumentList({
 							{sourceDocs.map((doc) => (
 								<tr key={doc.id} className="hover:bg-muted/50 transition-colors">
 									<td className="py-3 pl-4">
-										<p className="font-medium truncate">{doc.name}</p>
+										<div className="flex items-center gap-2">
+											<input
+												type="checkbox"
+												aria-label={`Select ${doc.name}`}
+												disabled={!commercial}
+												checked={selectedIds.includes(doc.id)}
+												onChange={() =>
+													setSelectedIds((current) =>
+														current.includes(doc.id)
+															? current.filter((id) => id !== doc.id)
+															: [...current, doc.id]
+													)
+												}
+											/>
+											<p className="font-medium truncate">{doc.name}</p>
+										</div>
 									</td>
 									<td className="py-3 px-2">
 										<LocaleSelect
@@ -477,6 +537,11 @@ export default function DocumentList({
 									</td>
 									<td className="py-4 pr-4">
 										<div className="flex items-center justify-end gap-2">
+											{(doc.status === 'approved' || doc.status === 'exported') && (
+												<Button variant="outline" size="sm" onClick={() => onSignOff?.(doc.id)}>
+													Sign off
+												</Button>
+											)}
 											{(doc.status === 'approved' || doc.status === 'exported') && (
 												<div className="relative" ref={exportMenuRef}>
 													<Button

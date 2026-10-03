@@ -1,7 +1,19 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
-import { app, BrowserWindow, dialog, ipcMain, net } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, net, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { type AuditEvent, auditEventsToCsv, parseAuditLine } from '../src/lib/audit'
+import { type CommercialCatalog, isPolarHttpsUrl, POLAR_API_BASE, parseCommercialCatalog } from '../src/lib/commercial'
+import { parseGlossary } from '../src/lib/glossary'
+import {
+	activationIdFromPolar,
+	cacheFromStored,
+	type LicenseProbe,
+	type StoredLicense,
+	snapshotFromPolar,
+} from '../src/lib/license'
+import { parseMemory } from '../src/lib/memory'
 
 // For dev logging
 const DEBUG = true
@@ -242,6 +254,10 @@ ipcMain.handle('pdf:parse', async (_event, filePath) => {
 
 // Settings persistence using JSON file
 const settingsFilePath = path.join(app.getPath('userData'), 'settings.json')
+const licenseFilePath = path.join(app.getPath('userData'), 'license.json')
+const glossaryFilePath = path.join(app.getPath('userData'), 'glossary.json')
+const memoryFilePath = path.join(app.getPath('userData'), 'memory.json')
+const auditFilePath = path.join(app.getPath('userData'), 'audit.jsonl')
 
 interface HistoryEntry {
 	id: string
@@ -505,6 +521,211 @@ ipcMain.handle('prompts:write', async (_event, filename: string, content: string
 	} catch (e) {
 		log('Error writing prompt:', e)
 		return false
+	}
+})
+
+function readStoredLicense(): StoredLicense | null {
+	try {
+		if (!fs.existsSync(licenseFilePath)) return null
+		const parsed = JSON.parse(fs.readFileSync(licenseFilePath, 'utf-8')) as StoredLicense
+		if (!parsed || typeof parsed.key !== 'string' || parsed.key.length === 0) return null
+		return parsed
+	} catch (e) {
+		log('Error loading license:', e)
+		return null
+	}
+}
+
+function writeStoredLicense(stored: StoredLicense): void {
+	ensureUserDataDir()
+	fs.writeFileSync(licenseFilePath, JSON.stringify(stored, null, 2), 'utf-8')
+}
+
+function readCommercialCatalog(): CommercialCatalog {
+	const candidates = [
+		process.env.DOCLZ_COMMERCIAL_CATALOG,
+		path.join(app.getAppPath(), 'commercial.public.json'),
+		path.join(app.getAppPath(), 'dist-electron', 'commercial.public.json'),
+	].filter((value): value is string => typeof value === 'string' && value.length > 0)
+	for (const filePath of candidates) {
+		try {
+			if (!fs.existsSync(filePath)) continue
+			return parseCommercialCatalog(JSON.parse(fs.readFileSync(filePath, 'utf-8')))
+		} catch {
+			log('Commercial catalog unreadable')
+		}
+	}
+	return parseCommercialCatalog(null)
+}
+
+async function polarPost(pathname: string, body: Record<string, unknown>): Promise<unknown> {
+	const response = await net.fetch(`${POLAR_API_BASE}${pathname}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(body),
+	})
+	if (!response.ok) {
+		throw new Error(`Polar responded ${response.status}`)
+	}
+	return response.json()
+}
+
+function emptyProbe(key: string | null, error?: string): LicenseProbe {
+	return { key, response: null, networkError: false, cache: null, error }
+}
+
+async function refreshLicense(key: string, activationId: string | null): Promise<LicenseProbe> {
+	const organizationId = readCommercialCatalog().organizationId
+	if (!organizationId) {
+		return emptyProbe(key, 'Commercial catalog is not configured')
+	}
+
+	const previous = readStoredLicense()
+	let nextActivation = activationId
+	try {
+		if (!nextActivation) {
+			const activated = await polarPost('/customer-portal/license-keys/activate', {
+				key,
+				organization_id: organizationId,
+				label: os.hostname(),
+			})
+			nextActivation = activationIdFromPolar(activated)
+		}
+		const validated = await polarPost('/customer-portal/license-keys/validate', {
+			key,
+			organization_id: organizationId,
+			...(nextActivation ? { activation_id: nextActivation } : {}),
+		})
+		const snapshot = snapshotFromPolar(validated)
+		const stored: StoredLicense = {
+			key,
+			activationId: nextActivation,
+			benefitId: snapshot?.benefitId ?? null,
+			expiresAt: snapshot?.expiresAt ?? null,
+			status: snapshot?.status ?? null,
+			lastValidatedAt: new Date().toISOString(),
+		}
+		writeStoredLicense(stored)
+		return {
+			key,
+			response: snapshot,
+			networkError: false,
+			cache: cacheFromStored(stored),
+		}
+	} catch (e) {
+		const message = e instanceof Error ? e.message : String(e)
+		const networkError = /fetch|network|ENOTFOUND|ECONN|timed out|ERR_/i.test(message)
+		const cache = previous?.key === key ? cacheFromStored(previous) : null
+		log('License check failed')
+		return { key, response: null, networkError, cache, error: message }
+	}
+}
+
+ipcMain.handle('commercial:catalog', () => readCommercialCatalog())
+
+ipcMain.handle('license:status', async (): Promise<LicenseProbe> => {
+	const stored = readStoredLicense()
+	if (!stored) return emptyProbe(null)
+	return refreshLicense(stored.key, stored.activationId)
+})
+
+ipcMain.handle('license:activate', async (_event, key: unknown): Promise<LicenseProbe> => {
+	if (typeof key !== 'string' || key.trim().length === 0) {
+		return emptyProbe(null, 'Enter a license key')
+	}
+	const trimmed = key.trim()
+	const stored = readStoredLicense()
+	const activationId = stored?.key === trimmed ? stored.activationId : null
+	return refreshLicense(trimmed, activationId)
+})
+
+ipcMain.handle('license:clear', async () => {
+	try {
+		if (fs.existsSync(licenseFilePath)) fs.unlinkSync(licenseFilePath)
+		return true
+	} catch (e) {
+		log('Error clearing license:', e)
+		return false
+	}
+})
+
+ipcMain.handle('shell:openExternal', async (_event, url: unknown) => {
+	if (typeof url !== 'string' || !isPolarHttpsUrl(url)) {
+		throw new Error('Invalid Polar URL')
+	}
+	await shell.openExternal(url)
+	return true
+})
+
+ipcMain.handle('glossary:load', async () => {
+	try {
+		ensureUserDataDir()
+		if (!fs.existsSync(glossaryFilePath)) return []
+		return parseGlossary(JSON.parse(fs.readFileSync(glossaryFilePath, 'utf-8')))
+	} catch (e) {
+		log('Error loading glossary:', e)
+		return []
+	}
+})
+
+ipcMain.handle('glossary:save', async (_event, entries: unknown) => {
+	try {
+		ensureUserDataDir()
+		fs.writeFileSync(glossaryFilePath, JSON.stringify(parseGlossary(entries), null, 2), 'utf-8')
+		return true
+	} catch (e) {
+		log('Error saving glossary:', e)
+		return false
+	}
+})
+
+ipcMain.handle('memory:load', async () => {
+	try {
+		ensureUserDataDir()
+		if (!fs.existsSync(memoryFilePath)) return []
+		return parseMemory(JSON.parse(fs.readFileSync(memoryFilePath, 'utf-8')))
+	} catch (e) {
+		log('Error loading memory:', e)
+		return []
+	}
+})
+
+ipcMain.handle('memory:save', async (_event, entries: unknown) => {
+	try {
+		ensureUserDataDir()
+		fs.writeFileSync(memoryFilePath, JSON.stringify(parseMemory(entries), null, 2), 'utf-8')
+		return true
+	} catch (e) {
+		log('Error saving memory:', e)
+		return false
+	}
+})
+
+ipcMain.handle('audit:append', async (_event, event: AuditEvent) => {
+	try {
+		ensureUserDataDir()
+		fs.appendFileSync(auditFilePath, `${JSON.stringify(event)}\n`, 'utf-8')
+		return true
+	} catch (e) {
+		log('Error appending audit event:', e)
+		return false
+	}
+})
+
+ipcMain.handle('audit:export', async () => {
+	try {
+		const savePath = await dialog.showSaveDialog({
+			defaultPath: 'document-localizer-review.csv',
+			filters: [{ name: 'CSV', extensions: ['csv'] }],
+		})
+		if (savePath.canceled || !savePath.filePath) return null
+		const lines = fs.existsSync(auditFilePath) ? fs.readFileSync(auditFilePath, 'utf-8').split('\n') : []
+		const events = lines.map(parseAuditLine).filter((event): event is AuditEvent => event !== null)
+		fs.writeFileSync(savePath.filePath, auditEventsToCsv(events), 'utf-8')
+		return savePath.filePath
+	} catch (e) {
+		log('Error exporting audit:', e)
+		return null
 	}
 })
 

@@ -75,6 +75,9 @@ export interface ProcessingOutput {
 	localizedText?: string
 	progress?: { current: number; total: number; phase?: string }
 	error?: string
+	memoryHits?: number
+	glossaryCount?: number
+	review?: { reviewerName: string; decision: 'confirmed' | 'returned'; at: string }
 }
 
 /**

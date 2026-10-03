@@ -58,6 +58,28 @@ contextBridge.exposeInMainWorld('electron', {
 
 	deletePrompt: (filename: string) => ipcRenderer.invoke('prompts:delete', filename),
 
+	commercialCatalog: () => ipcRenderer.invoke('commercial:catalog'),
+
+	licenseStatus: () => ipcRenderer.invoke('license:status'),
+
+	activateLicense: (key: string) => ipcRenderer.invoke('license:activate', key),
+
+	clearLicense: () => ipcRenderer.invoke('license:clear'),
+
+	openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
+
+	loadGlossary: () => ipcRenderer.invoke('glossary:load'),
+
+	saveGlossary: (entries: object) => ipcRenderer.invoke('glossary:save', entries),
+
+	loadMemory: () => ipcRenderer.invoke('memory:load'),
+
+	saveMemory: (entries: object) => ipcRenderer.invoke('memory:save', entries),
+
+	appendAudit: (event: object) => ipcRenderer.invoke('audit:append', event),
+
+	exportAudit: () => ipcRenderer.invoke('audit:export'),
+
 	appVersion: () => ipcRenderer.invoke('app:version'),
 
 	checkForUpdates: () => ipcRenderer.invoke('update:check'),
