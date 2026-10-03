@@ -4,7 +4,7 @@ Electron desktop application for document localization.
 
 ## Overview
 
-Cross-platform desktop app that localizes documents between American and British English using local AI models. All processing happens locally - documents never leave your machine.
+Cross-platform desktop app that localizes documents between locales using local AI models. Document text stays on your machine and is sent only to the local model you configure.
 
 ## Features
 

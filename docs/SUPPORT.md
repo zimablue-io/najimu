@@ -29,7 +29,7 @@ Document Localizer requires a local AI server to function. It does not include o
 
 ### Platform Support
 
-Currently available for **macOS only**. Windows and Linux builds are planned but not yet available.
+Desktop builds are published for macOS, Windows, and Linux. Download them from the project releases page.
 
 ### Document Formats
 
@@ -43,6 +43,6 @@ Other formats are not supported.
 
 Have an idea? Open a GitHub Discussion or issue with the label "enhancement".
 
-## Commercial Support
+## Commercial Use
 
-For commercial licensing or custom development, please open an issue to discuss your needs.
+Commercial use requires a Document Localizer Commercial license issued by zimablue-io. See [LICENSE.md](../LICENSE.md). A GitHub issue does not grant that license.

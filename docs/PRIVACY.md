@@ -23,7 +23,12 @@ This data is anonymized and cannot be used to identify individual users. Documen
 
 ### Desktop Application
 
-The Document Localizer desktop application does **not** collect any data. All document processing happens locally on your machine.
+Document text stays on your computer. The desktop app sends that text only to the local AI server you configure. It does not run product analytics.
+
+The desktop app makes two other network requests, and neither includes document text:
+
+- Update checks contact GitHub Releases to see whether a newer version exists.
+- A Commercial license check sends the license key to Polar at `https://api.polar.sh`. Polar sells that license and keeps the purchase record.
 
 ## Third-Party Services
 
@@ -31,12 +36,17 @@ The Document Localizer desktop application does **not** collect any data. All do
 
 When you use Document Localizer, text from your documents is sent to a local AI server (Ollama, LM Studio, or llama.cpp) that you control. We have no access to this data.
 
+### Polar
+
+Polar handles Commercial checkout and license-key validation. Their privacy practices are governed by [Polar's Privacy Policy](https://polar.sh/legal/privacy).
+
 ### GitHub
 
 We use GitHub for:
 - Hosting source code
 - Release downloads
 - Issue tracking
+- Update checks from the desktop app
 
 Their privacy practices are governed by [GitHub's Privacy Policy](https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement).
 
@@ -46,11 +56,11 @@ We do not use cookies on this website.
 
 ## Data Retention
 
-Since we do not collect personal data, there is no retention to manage.
+Vercel keeps the landing-page analytics described above. Polar keeps Commercial purchase and license records. The desktop app stores settings, documents, glossary, translation memory, the review record, and the license key only on your computer.
 
 ## Your Rights
 
-Because we do not collect personal data, there is no data to access, correct, or delete.
+Landing-page analytics are handled by Vercel. Commercial purchase records are handled by Polar, in the customer portal at https://polar.sh/purchases. Documents, glossary, translation memory, and the review record stay in the desktop app's local files; delete those files on your computer.
 
 ## Contact
 

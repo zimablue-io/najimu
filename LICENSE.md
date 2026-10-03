@@ -8,24 +8,24 @@ Permission is hereby granted to use, copy, modify, and distribute this software 
 
 ## Commercial Use
 
-**Commercial use of this software is not permitted without prior written authorization** from the copyright holder.
+**Commercial use requires a Document Localizer Commercial license issued by zimablue-io.**
 
-Commercial use includes but is not limited to:
+Commercial use includes:
 - Using this software in a commercial product or service
 - Incorporating this software into commercial applications
 - Using this software to generate revenue in any form
 
-To request commercial licensing, please open an issue on GitHub discussing your intended use case.
+A GitHub issue is not a commercial license. Personal and non-commercial use does not require one.
 
 ## What This Means
 
 | Use Case | Permission |
 |----------|------------|
-| Personal use | ✅ Free |
-| Open source contribution | ✅ Allowed |
-| Forking for personal use | ✅ Allowed |
-| Commercial product | ❌ Requires permission |
-| Commercial SaaS | ❌ Requires permission |
+| Personal use | Free |
+| Open source contribution | Allowed |
+| Forking for personal use | Allowed |
+| Commercial product | Requires a Document Localizer Commercial license |
+| Commercial SaaS | Requires a Document Localizer Commercial license |
 
 ## No Warranty
 
@@ -33,5 +33,5 @@ This software is provided "as is" without warranty of any kind, express or impli
 
 ## Contact
 
-For questions regarding this license or to request commercial use permissions, please open an issue at:
+For questions about this license, open an issue at:
 https://github.com/zimablue-io/document-localizer
