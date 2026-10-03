@@ -1,8 +1,9 @@
 import { track } from '@vercel/analytics'
 import { Download, FileText, Info } from 'lucide-react'
 import { useState } from 'react'
-import { Platform, usePlatform } from '../hooks/usePlatform'
+import { Platform, useMachine } from '../hooks/usePlatform'
 import { DownloadArch, downloadClick, downloadHref } from '../lib/downloads'
+import { resolveDownloadChoice } from '../lib/machine'
 import { GitHubIcon } from './Icons'
 
 type PlatformKey = 'macos' | 'windows' | 'linux'
@@ -63,12 +64,13 @@ function LocalizedText() {
 }
 
 export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) {
-	const detectedPlatform = usePlatform()
-	const [macArch, setMacArch] = useState<DownloadArch>('arm64')
-	const platform =
-		selectedPlatform ?? ((detectedPlatform !== 'unsupported' ? detectedPlatform : 'macos') as PlatformKey)
-	const isSupported = platform !== 'unsupported'
-	const arch: DownloadArch = platform === 'macos' ? macArch : 'x64'
+	const detected = useMachine()
+	const [macArchOverride, setMacArchOverride] = useState<DownloadArch | null>(null)
+	const choice = resolveDownloadChoice(detected, selectedPlatform, macArchOverride)
+	const platform = choice.platform
+	const isSupported = platform === 'macos' || platform === 'windows' || platform === 'linux'
+	const arch: DownloadArch = choice.arch ?? 'arm64'
+	const macArch: DownloadArch = platform === 'macos' ? arch : 'arm64'
 	const downloadLabel =
 		platform === 'macos'
 			? `Download for macOS (${macArchLabels[macArch]})`
@@ -142,7 +144,11 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 							{(Object.keys(platformLabels) as PlatformKey[]).map((p) => (
 								<button
 									key={p}
-									onClick={() => onPlatformChange(p)}
+									type="button"
+									onClick={() => {
+										if (p === 'macos' && platform !== 'macos') setMacArchOverride(null)
+										onPlatformChange(p)
+									}}
 									className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
 										platform === p
 											? 'border-primary text-primary'
@@ -160,7 +166,7 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 									<button
 										key={archOption}
 										type="button"
-										onClick={() => setMacArch(archOption)}
+										onClick={() => setMacArchOverride(archOption)}
 										aria-pressed={macArch === archOption}
 										className={`px-3 py-1 text-sm rounded-md border transition-colors ${
 											macArch === archOption

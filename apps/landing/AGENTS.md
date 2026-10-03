@@ -35,9 +35,13 @@ apps/landing/src/
 
 ## Platform Detection
 
-`hooks/usePlatform.ts` detects user platform:
-- `macos` → Active download button
-- Other → Disabled button "Currently available for macOS only"
+`hooks/usePlatform.ts` reads the browser and `lib/machine.ts` decides the download:
+- Windows → Windows installer
+- Linux → Linux AppImage
+- Apple silicon Mac → Apple silicon disk, including when the user agent still says "Intel Mac OS X"
+- Intel Mac → Intel disk, from client hints or the GPU renderer
+- Phone, tablet, or anything else → no download until the visitor picks a desktop tab
+- Choosing macOS again after another tab returns to that Mac's processor
 
 ## Static Files
 
