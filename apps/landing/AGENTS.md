@@ -40,8 +40,8 @@ apps/landing/src/
 - Linux → Linux AppImage
 - Apple silicon Mac → Apple silicon disk, including when the user agent still says "Intel Mac OS X"
 - Intel Mac → Intel disk, from client hints or the GPU renderer
-- Phone, tablet, or anything else → no download until the visitor picks a desktop tab
-- Choosing macOS again after another tab returns to that Mac's processor
+- Phone, tablet, or anything else → the download button stays inactive until the visitor picks a desktop build from the menu beside it
+- That menu lists the other builds. It sits next to the detected download button and does not move the hero when it opens
 
 ## Static Files
 

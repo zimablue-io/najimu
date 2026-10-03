@@ -1,27 +1,14 @@
 import { track } from '@vercel/analytics'
-import { Download, FileText, Info } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronDown, Download, FileText } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Platform, useMachine } from '../hooks/usePlatform'
-import { DownloadArch, downloadClick, downloadHref } from '../lib/downloads'
+import { DownloadArch, downloadButtonLabel, downloadClick, downloadHref, otherDownloadChoices } from '../lib/downloads'
 import { resolveDownloadChoice } from '../lib/machine'
 import { GitHubIcon } from './Icons'
-
-type PlatformKey = 'macos' | 'windows' | 'linux'
-
-const macArchLabels: Record<DownloadArch, string> = {
-	arm64: 'Apple silicon',
-	x64: 'Intel',
-}
 
 interface HeroProps {
 	selectedPlatform: Platform | null
 	onPlatformChange: (platform: Platform | null) => void
-}
-
-const platformLabels: Record<PlatformKey, string> = {
-	macos: 'macOS',
-	windows: 'Windows',
-	linux: 'Linux',
 }
 
 const originalText = 'Mom parked the car. Her favorite color is on the soccer jersey.'
@@ -66,17 +53,30 @@ function LocalizedText() {
 export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) {
 	const detected = useMachine()
 	const [macArchOverride, setMacArchOverride] = useState<DownloadArch | null>(null)
+	const [menuOpen, setMenuOpen] = useState(false)
+	const menuRef = useRef<HTMLDivElement>(null)
 	const choice = resolveDownloadChoice(detected, selectedPlatform, macArchOverride)
 	const platform = choice.platform
 	const isSupported = platform === 'macos' || platform === 'windows' || platform === 'linux'
-	const arch: DownloadArch = choice.arch ?? 'arm64'
-	const macArch: DownloadArch = platform === 'macos' ? arch : 'arm64'
-	const downloadLabel =
-		platform === 'macos'
-			? `Download for macOS (${macArchLabels[macArch]})`
-			: platform === 'windows' || platform === 'linux'
-				? `Download for ${platformLabels[platform]}`
-				: 'Download'
+	const arch: DownloadArch | null = isSupported ? (choice.arch ?? 'arm64') : null
+	const downloadLabel = downloadButtonLabel(platform, arch)
+	const otherChoices = otherDownloadChoices(platform, arch)
+
+	useEffect(() => {
+		if (!menuOpen) return
+		const onPointerDown = (event: PointerEvent) => {
+			if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false)
+		}
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') setMenuOpen(false)
+		}
+		document.addEventListener('pointerdown', onPointerDown)
+		document.addEventListener('keydown', onKeyDown)
+		return () => {
+			document.removeEventListener('pointerdown', onPointerDown)
+			document.removeEventListener('keydown', onKeyDown)
+		}
+	}, [menuOpen])
 
 	return (
 		<section className="min-h-[calc(100vh-80px)] flex items-center px-6 md:px-12 py-16 relative overflow-hidden">
@@ -99,73 +99,69 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 					</p>
 
 					<div className="flex flex-col gap-3 pt-4">
-						{/* Platform Tabs */}
-						<div className="flex border-b border-border">
-							{(Object.keys(platformLabels) as PlatformKey[]).map((p) => (
-								<button
-									key={p}
-									type="button"
+						<div className="relative z-20 flex h-12 w-full items-stretch gap-2">
+							{isSupported && arch ? (
+								<a
+									href={downloadHref(platform, arch)}
 									onClick={() => {
-										if (p === 'macos' && platform !== 'macos') setMacArchOverride(null)
-										onPlatformChange(p)
+										const event = downloadClick(platform, arch)
+										track(event.name, event.data)
 									}}
-									className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-										platform === p
-											? 'border-primary text-primary'
-											: 'border-transparent text-muted-foreground hover:text-foreground'
-									}`}
+									className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 animate-glow"
 								>
-									{platformLabels[p]}
+									<Download className="h-5 w-5 shrink-0" />
+									<span className="truncate">{downloadLabel}</span>
+								</a>
+							) : (
+								<button
+									type="button"
+									disabled
+									className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-4 font-medium text-muted-foreground cursor-not-allowed"
+								>
+									<Download className="h-5 w-5 shrink-0" />
+									<span className="truncate">{downloadLabel}</span>
 								</button>
-							))}
-						</div>
-
-						{platform === 'macos' && (
-							<div className="flex gap-2" role="group" aria-label="Mac processor">
-								{(Object.keys(macArchLabels) as DownloadArch[]).map((archOption) => (
-									<button
-										key={archOption}
-										type="button"
-										onClick={() => setMacArchOverride(archOption)}
-										aria-pressed={macArch === archOption}
-										className={`px-3 py-1 text-sm rounded-md border transition-colors ${
-											macArch === archOption
-												? 'border-primary text-primary'
-												: 'border-border text-muted-foreground hover:text-foreground'
-										}`}
+							)}
+							<div className="relative" ref={menuRef}>
+								<button
+									type="button"
+									className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border bg-card hover:border-primary"
+									aria-haspopup="menu"
+									aria-expanded={menuOpen}
+									aria-label="Other downloads"
+									onClick={() => setMenuOpen((open) => !open)}
+								>
+									<ChevronDown className={`h-5 w-5 ${menuOpen ? 'rotate-180' : ''}`} />
+								</button>
+								{menuOpen && (
+									<div
+										role="menu"
+										className="absolute right-0 top-[calc(100%+0.5rem)] z-20 w-56 rounded-lg border border-border bg-card p-1 shadow-lg"
 									>
-										{macArchLabels[archOption]}
-									</button>
-								))}
+										{otherChoices.map((option) => (
+											<button
+												key={`${option.platform}-${option.arch}`}
+												type="button"
+												role="menuitem"
+												className="flex h-10 w-full items-center rounded-md px-3 text-left text-sm hover:bg-primary/10"
+												onClick={() => {
+													onPlatformChange(option.platform)
+													setMacArchOverride(option.platform === 'macos' ? option.arch : null)
+													setMenuOpen(false)
+												}}
+											>
+												{option.label}
+											</button>
+										))}
+									</div>
+								)}
 							</div>
-						)}
-
-						{isSupported ? (
-							<a
-								href={downloadHref(platform, arch)}
-								onClick={() => {
-									const event = downloadClick(platform, arch)
-									track(event.name, event.data)
-								}}
-								className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25 animate-glow"
-							>
-								<Download className="w-5 h-5" />
-								{downloadLabel}
-							</a>
-						) : (
-							<button
-								disabled
-								className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-muted text-muted-foreground rounded-lg font-medium cursor-not-allowed opacity-60"
-							>
-								<Info className="w-5 h-5" />
-								Currently only macOS, Windows, and Linux are supported
-							</button>
-						)}
+						</div>
 						<a
 							href="https://github.com/zimablue-io/document-localizer"
-							className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-border rounded-lg font-medium hover:bg-card transition-all hover:scale-105"
+							className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-border px-4 font-medium hover:bg-card"
 						>
-							<GitHubIcon className="w-5 h-5" />
+							<GitHubIcon className="h-5 w-5 shrink-0" />
 							View on GitHub
 						</a>
 						<p className="text-xs text-muted-foreground text-center md:text-left">

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { downloadClick, downloadHref } from './downloads'
+import { downloadButtonLabel, downloadClick, downloadHref, otherDownloadChoices } from './downloads'
 
 const BASE = 'https://github.com/zimablue-io/document-localizer/releases/latest/download'
 
@@ -41,6 +41,23 @@ describe('download click', () => {
 		expect(() => downloadClick('unsupported', 'x64')).toThrow(/platform/)
 		expect(() => downloadHref('macos', 'arm')).toThrow(/arch/)
 		expect(() => downloadHref('windows', 'arm64')).toThrow(/arch/)
+	})
+
+	it('keeps the detected build on the button and lists the other builds beside it', () => {
+		expect(downloadButtonLabel('macos', 'arm64')).toBe('Download for macOS (Apple silicon)')
+		expect(otherDownloadChoices('macos', 'arm64').map((choice) => `${choice.platform}:${choice.arch}`)).toEqual([
+			'macos:x64',
+			'windows:x64',
+			'linux:x64',
+		])
+		expect(downloadButtonLabel('windows', 'x64')).toBe('Download for Windows')
+		expect(otherDownloadChoices('windows', 'x64').map((choice) => choice.label)).toEqual([
+			'macOS (Apple silicon)',
+			'macOS (Intel)',
+			'Linux',
+		])
+		expect(downloadButtonLabel('unsupported', null)).toBe('Download')
+		expect(otherDownloadChoices('unsupported', null)).toHaveLength(4)
 	})
 
 	it('uses the same file names electron-builder writes', () => {

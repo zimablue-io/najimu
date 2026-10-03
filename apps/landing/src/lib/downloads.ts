@@ -4,6 +4,22 @@ const DOWNLOAD_ARCHS = ['arm64', 'x64'] as const
 export type DownloadPlatform = (typeof DOWNLOAD_PLATFORMS)[number]
 export type DownloadArch = (typeof DOWNLOAD_ARCHS)[number]
 
+export const DOWNLOAD_CHOICES: { platform: DownloadPlatform; arch: DownloadArch; label: string }[] = [
+	{ platform: 'macos', arch: 'arm64', label: 'macOS (Apple silicon)' },
+	{ platform: 'macos', arch: 'x64', label: 'macOS (Intel)' },
+	{ platform: 'windows', arch: 'x64', label: 'Windows' },
+	{ platform: 'linux', arch: 'x64', label: 'Linux' },
+]
+
+export function downloadButtonLabel(platform: string, arch: string | null): string {
+	const choice = DOWNLOAD_CHOICES.find((item) => item.platform === platform && item.arch === arch)
+	return choice ? `Download for ${choice.label}` : 'Download'
+}
+
+export function otherDownloadChoices(platform: string, arch: string | null) {
+	return DOWNLOAD_CHOICES.filter((choice) => choice.platform !== platform || choice.arch !== arch)
+}
+
 const RELEASE_DOWNLOAD_BASE = 'https://github.com/zimablue-io/document-localizer/releases/latest/download'
 
 // electron-builder writes x64 AppImage files as x86_64.
