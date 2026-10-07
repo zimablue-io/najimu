@@ -1,9 +1,9 @@
-declare module '@doclocalizer/ui/index.css' {
+declare module '@najimu/ui/index.css' {
 	const content: string
 	export default content
 }
 
-declare module '@doclocalizer/ui/*.css' {
+declare module '@najimu/ui/*.css' {
 	const content: string
 	export default content
 }

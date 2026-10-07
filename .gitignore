@@ -33,6 +33,12 @@ workspace/.batch-status.json
 # Secrets
 .env
 
+# SEO files rendered from apps/landing/seo/ by scripts/render-seo.mjs
+apps/landing/public/sitemap.xml
+apps/landing/public/robots.txt
+apps/landing/public/llms.txt
+apps/landing/public/manifest.webmanifest
+
 # Build outputs
 dist/
 apps/desktop/dist/

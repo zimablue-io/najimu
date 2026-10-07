@@ -1,6 +1,7 @@
 import { Download, Info } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Platform, usePlatform } from '../../hooks/usePlatform'
+import { REPO_URL, releasesUrl } from '../../lib/site'
 import { GitHubIcon } from '../Icons'
 import { DEMO_EXAMPLES } from './examples'
 import LocaleDemo from './LocaleDemo'
@@ -19,9 +20,9 @@ const platformLabels: Record<PlatformKey, string> = {
 }
 
 const platformDownloadUrls: Record<PlatformKey, string> = {
-	macos: 'https://github.com/zimablue-io/document-localizer/releases/latest',
-	windows: 'https://github.com/zimablue-io/document-localizer/releases/latest',
-	linux: 'https://github.com/zimablue-io/document-localizer/releases/latest',
+	macos: releasesUrl,
+	windows: releasesUrl,
+	linux: releasesUrl,
 }
 
 function DemoTabs() {
@@ -117,11 +118,15 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 				<div className="space-y-4 md:space-y-6 text-center md:text-left">
 					<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
 						<span className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
-							Localize PDFs and Markdown on your machine
+							Documents that finally fit in
 						</span>
 					</h1>
 					<p className="text-lg md:text-xl text-muted-foreground">
-						A private translator for 100+ locales. Your files stay on this computer.
+						Najimu adapts PDFs and Markdown for 100+ locales. Your files stay on this computer.
+					</p>
+					<p className="text-sm text-muted-foreground">
+						<span className="text-foreground font-medium">najimu</span> (馴染む) means to fit in, to grow
+						familiar with a place. That is what your document does when it meets its new locale.
 					</p>
 
 					<div className="flex flex-col gap-3 pt-4">
@@ -161,7 +166,7 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 							</button>
 						)}
 						<a
-							href="https://github.com/zimablue-io/document-localizer"
+							href={REPO_URL}
 							className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-border rounded-lg font-medium hover:bg-card transition-all hover:scale-105"
 						>
 							<GitHubIcon className="w-5 h-5" />

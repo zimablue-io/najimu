@@ -34,4 +34,4 @@ This software is provided "as is" without warranty of any kind, express or impli
 ## Contact
 
 For questions regarding this license or to request commercial use permissions, please open an issue at:
-https://github.com/zimablue-io/document-localizer
+https://github.com/zimablue-io/najimu

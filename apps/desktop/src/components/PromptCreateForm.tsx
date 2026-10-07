@@ -1,4 +1,4 @@
-import { Button, Input, Label } from '@doclocalizer/ui'
+import { Button, Input, Label } from '@najimu/ui'
 import { Plus, X } from 'lucide-react'
 import { useMemo } from 'react'
 import { validatePromptTemplate } from '../lib/prompts'

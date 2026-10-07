@@ -24,8 +24,8 @@ packages/ui/src/
 ## Usage
 
 ```tsx
-import { Button } from '@doclocalizer/ui'
-import '@doclocalizer/ui/index.css'
+import { Button } from '@najimu/ui'
+import '@najimu/ui/index.css'
 ```
 
 ## Tailwind v4

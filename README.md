@@ -1,4 +1,6 @@
-# Document Localizer
+# Najimu
+
+*najimu* (馴染む, Japanese) means "to fit in", "to grow familiar with a place". It is what a document does when it is localized: it stops reading like it was written somewhere else.
 
 A monorepo for document localization using AI.
 
@@ -7,8 +9,21 @@ A monorepo for document localization using AI.
 ```bash
 pnpm install
 pnpm dev:desktop   # Start desktop app
-pnpm dev:landing    # Start landing page
+pnpm dev:landing   # Start landing page
 ```
+
+## Environment
+
+The landing site's public URLs are declared in `apps/landing/.env.example`, one variable per entry. No env file is needed to build.
+
+| Variable | Purpose |
+|---|---|
+| `VITE_SITE_URL` | Origin the landing site is served from |
+| `VITE_REPO_URL` | Repository root, without a trailing slash |
+
+Vite substitutes `%VITE_SITE_URL%` / `%VITE_REPO_URL%` into `index.html`. The crawler-facing files (`sitemap.xml`, `robots.txt`, `llms.txt`, `manifest.webmanifest`) live in `apps/landing/seo/` as templates and are rendered into `apps/landing/public/` by `scripts/render-seo.mjs`, which runs before `dev` and `build`. The rendered copies are gitignored.
+
+To point a local build somewhere else, copy `apps/landing/.env.example` to `apps/landing/.env` and set the variables there. Precedence runs from `.env.example` up through `.env`, `.env.local`, and real environment variables, which is what CI and Vercel set.
 
 ## Architecture
 
@@ -23,7 +38,7 @@ pnpm dev:landing    # Start landing page
 
 ## Apps
 
-### @doclocalizer/desktop
+### @najimu/desktop
 Electron desktop application for document localization:
 - PDF and Markdown file processing
 - AI-powered localization via local LLMs (Ollama, LM Studio, llama.cpp)
@@ -31,7 +46,7 @@ Electron desktop application for document localization:
 - Three-tab system: Uploaded (source library) → Tasks (processing) → Processed (completed)
 - Export to Markdown or PDF
 
-### @doclocalizer/landing
+### @najimu/landing
 Marketing landing page at http://localhost:1421:
 - Hero section with animated transformation demo
 - Features section (5 cards)
@@ -41,14 +56,14 @@ Marketing landing page at http://localhost:1421:
 
 ## Packages
 
-### @doclocalizer/core
+### @najimu/core
 Core business logic for document localization:
 - PDF to Markdown conversion (pdfjs-dist)
 - Text chunking for LLM processing
 - OpenAI-compatible API client
 - Diff generation for review
 
-### @doclocalizer/ui
+### @najimu/ui
 Shared UI components:
 - Button, Input, Dialog, Select, Tabs
 - ScrollArea, AlertDialog, Sheet

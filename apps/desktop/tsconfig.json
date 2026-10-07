@@ -17,10 +17,10 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@doclocalizer/core": ["../../packages/core/dist"],
-      "@doclocalizer/core/*": ["../../packages/core/dist/*"],
-      "@doclocalizer/ui": ["../../packages/ui/src"],
-      "@doclocalizer/ui/*": ["../../packages/ui/src/*"]
+      "@najimu/core": ["../../packages/core/dist"],
+      "@najimu/core/*": ["../../packages/core/dist/*"],
+      "@najimu/ui": ["../../packages/ui/src"],
+      "@najimu/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["src"],

@@ -1,5 +1,5 @@
-// Document Localizer - Main Application Component
-import { Button } from '@doclocalizer/ui'
+// Najimu - Main Application Component
+import { Button } from '@najimu/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Toaster, toast } from 'sonner'
 import DiffView from './components/DiffView'

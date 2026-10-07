@@ -1,4 +1,4 @@
-import { Button, ScrollArea } from '@doclocalizer/ui'
+import { Button, ScrollArea } from '@najimu/ui'
 import { diffWords } from 'diff'
 import { Check, LayoutList, X } from 'lucide-react'
 import { useCallback, useState } from 'react'

@@ -1,2 +1,2 @@
-declare module '@doclocalizer/ui/index.css'
-declare module '@doclocalizer/ui/*.css'
+declare module '@najimu/ui/index.css'
+declare module '@najimu/ui/*.css'

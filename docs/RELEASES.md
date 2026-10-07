@@ -1,6 +1,6 @@
 # Release Process
 
-This document explains how releases work for Document Localizer.
+This document explains how releases work for Najimu.
 
 ## Overview
 

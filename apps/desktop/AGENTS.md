@@ -93,7 +93,7 @@ Terminology consistency across documents, built in and not configurable.
 
 ## Settings Storage
 
-Located in `~/Library/Application Support/document-localizer/`:
+Located in `~/Library/Application Support/Najimu/`:
 - `settings.json` - App configuration
 - `history.json` - Processing history
 - `uploaded.json` - Source document library

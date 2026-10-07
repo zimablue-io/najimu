@@ -1,8 +1,8 @@
 {
-	"name": "Document Localizer",
-	"short_name": "DocLocalizer",
-	"description": "AI-Powered PDF & Markdown Localization. Local, Private, Free.",
-	"start_url": "/",
+	"name": "Najimu",
+	"short_name": "Najimu",
+	"description": "Documents that fit in. Local, private PDF and Markdown localization.",
+	"start_url": "%VITE_SITE_URL%/",
 	"scope": "/",
 	"display": "standalone",
 	"background_color": "#0a0a0f",

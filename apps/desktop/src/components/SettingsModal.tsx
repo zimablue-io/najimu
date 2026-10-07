@@ -1,4 +1,4 @@
-import { Button, Input, Label, ScrollArea, Tabs, TabsContent, TabsList, TabsTrigger } from '@doclocalizer/ui'
+import { Button, Input, Label, ScrollArea, Tabs, TabsContent, TabsList, TabsTrigger } from '@najimu/ui'
 import { Check, Edit2, Plus, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { ALL_LOCALES } from '../lib/locales'

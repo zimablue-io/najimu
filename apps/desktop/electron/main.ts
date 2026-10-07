@@ -108,7 +108,7 @@ function createWindow() {
 	mainWindow = new BrowserWindow({
 		width: 1200,
 		height: 800,
-		title: 'Document Localizer',
+		title: 'Najimu',
 		backgroundColor: '#0a0a0f',
 		webPreferences: {
 			nodeIntegration: false,

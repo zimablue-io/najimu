@@ -4,21 +4,21 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<title>Document Localizer - Free PDF &amp; Markdown AI Translator (Local, Private)</title>
-		<meta name="description" content="Free offline PDF and Markdown translator powered by local AI. Localize documents between 100+ locales (English US/UK/AU/CA, Spanish ES/MX, Portuguese PT/BR, more) using Ollama, LM Studio, or llama.cpp. Your files never leave your machine." />
+		<title>Najimu - Free Offline PDF &amp; Markdown Localizer (Private, On-Device)</title>
+		<meta name="description" content="Free offline PDF and Markdown localizer powered by local AI. Adapt documents across 100+ locales (English US/UK/AU/CA, Spanish ES/MX, Portuguese PT/BR, more) using Ollama, LM Studio, or llama.cpp. Your files never leave your machine." />
 		<meta name="author" content="zimablue-io" />
 		<meta name="theme-color" content="#6366f1" />
 		<meta name="color-scheme" content="dark" />
-		<link rel="canonical" href="https://zimablue-io.github.io/document-localizer/" />
-		<link rel="preconnect" href="https://zimablue-io.github.io" />
-		<link rel="dns-prefetch" href="https://github.com" />
+		<link rel="canonical" href="%VITE_SITE_URL%/" />
+		<link rel="preconnect" href="%VITE_SITE_URL%" />
+		<link rel="dns-prefetch" href="%VITE_REPO_URL%" />
 
 		<!-- Open Graph / Social -->
 		<meta property="og:type" content="website" />
-		<meta property="og:url" content="https://zimablue-io.github.io/document-localizer/" />
-		<meta property="og:title" content="Document Localizer - Free Offline PDF &amp; Markdown AI Translator" />
-		<meta property="og:description" content="AI-powered document localization between 100+ locales. 100% offline, 100% private. Works with Ollama, LM Studio, and llama.cpp. Free for personal use." />
-		<meta property="og:site_name" content="Document Localizer" />
+		<meta property="og:url" content="%VITE_SITE_URL%/" />
+		<meta property="og:title" content="Najimu - Free Offline PDF &amp; Markdown Localizer" />
+		<meta property="og:description" content="AI-powered document localization across 100+ locales. 100% offline, 100% private. Works with Ollama, LM Studio, and llama.cpp. Free for personal use." />
+		<meta property="og:site_name" content="Najimu" />
 		<meta property="og:locale" content="en_US" />
 		<meta property="og:locale:alternate" content="en_GB" />
 		<meta property="og:locale:alternate" content="en_AU" />
@@ -26,21 +26,21 @@
 		<meta property="og:locale:alternate" content="es_ES" />
 		<meta property="og:locale:alternate" content="es_MX" />
 		<meta property="og:locale:alternate" content="pt_BR" />
-		<meta property="og:image" content="https://zimablue-io.github.io/document-localizer/images/og-image.png" />
-		<meta property="og:image:secure_url" content="https://zimablue-io.github.io/document-localizer/images/og-image.png" />
+		<meta property="og:image" content="%VITE_SITE_URL%/images/og-image.png" />
+		<meta property="og:image:secure_url" content="%VITE_SITE_URL%/images/og-image.png" />
 		<meta property="og:image:type" content="image/png" />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta property="og:image:alt" content="Document Localizer - AI-powered PDF and Markdown localization, 100% local and private" />
+		<meta property="og:image:alt" content="Najimu - documents that fit in. Local, private document localization." />
 
 		<!-- Twitter -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:site" content="@zimablue_io" />
 		<meta name="twitter:creator" content="@zimablue_io" />
-		<meta name="twitter:title" content="Document Localizer - Free Offline PDF &amp; Markdown AI Translator" />
-		<meta name="twitter:description" content="AI-powered document localization between 100+ locales. 100% offline, 100% private. Works with Ollama, LM Studio, and llama.cpp." />
-		<meta name="twitter:image" content="https://zimablue-io.github.io/document-localizer/images/og-image.png" />
-		<meta name="twitter:image:alt" content="Document Localizer - AI-powered PDF and Markdown localization, 100% local and private" />
+		<meta name="twitter:title" content="Najimu - Free Offline PDF &amp; Markdown Localizer" />
+		<meta name="twitter:description" content="AI-powered document localization across 100+ locales. 100% offline, 100% private. Works with Ollama, LM Studio, and llama.cpp." />
+		<meta name="twitter:image" content="%VITE_SITE_URL%/images/og-image.png" />
+		<meta name="twitter:image:alt" content="Najimu - documents that fit in. Local, private document localization." />
 
 		<!-- Icons -->
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -56,38 +56,39 @@
 			"@graph": [
 				{
 					"@type": "SoftwareApplication",
-					"name": "Document Localizer",
-					"description": "AI-powered desktop application for offline document localization and translation. Converts PDF and Markdown files between 100+ locales using locally-run AI models (Ollama, LM Studio, llama.cpp). All processing happens on the user's machine; no cloud, no API keys, no data leaves the device.",
-					"url": "https://zimablue-io.github.io/document-localizer/",
+					"name": "Najimu",
+					"description": "AI-powered desktop application for offline document localization. Adapts PDF and Markdown files across 100+ locales using locally-run AI models (Ollama, LM Studio, llama.cpp). All processing happens on the user's machine; no cloud, no API keys, no data leaves the device.",
+					"url": "%VITE_SITE_URL%/",
 					"applicationCategory": "UtilitiesApplication",
 					"applicationSubCategory": "TranslationSoftware",
 					"operatingSystem": "macOS, Windows, Linux",
 					"softwareVersion": "1.0.0",
-					"downloadUrl": "https://github.com/zimablue-io/document-localizer/releases/latest",
+					"downloadUrl": "%VITE_REPO_URL%/releases/latest",
 					"softwareRequirements": "4GB RAM minimum (8GB recommended), ~5GB disk space per AI model, local AI backend (Ollama, LM Studio, or llama.cpp)",
 					"featureList": [
-						"100% offline document translation between 100+ locales",
+						"100% offline document localization across 100+ locales",
 						"Privacy-first: documents never leave your device",
 						"Works with any OpenAI-compatible local model (Llama 3, Mistral, Phi, Gemma, Qwen)",
 						"PDF and Markdown input and output",
 						"Side-by-side diff review with paragraph-level approve/reject",
+						"Translation memory that reuses approved wording across documents",
 						"Supports Ollama, LM Studio, and llama.cpp backends",
 						"Cross-platform: macOS, Windows, Linux"
 					],
 					"screenshot": [
 						{
 							"@type": "ImageObject",
-							"url": "https://zimablue-io.github.io/document-localizer/images/step%201%20-%20uploaded.png",
+							"url": "%VITE_SITE_URL%/images/step%201%20-%20uploaded.png",
 							"caption": "Upload PDF or Markdown files and select source and target locales"
 						},
 						{
 							"@type": "ImageObject",
-							"url": "https://zimablue-io.github.io/document-localizer/images/step%202%20-%20tasks.png",
+							"url": "%VITE_SITE_URL%/images/step%202%20-%20tasks.png",
 							"caption": "Review AI translations in a side-by-side diff view with paragraph editing"
 						},
 						{
 							"@type": "ImageObject",
-							"url": "https://zimablue-io.github.io/document-localizer/images/step%203%20-%20processed.png",
+							"url": "%VITE_SITE_URL%/images/step%203%20-%20processed.png",
 							"caption": "Export approved localized documents as Markdown or PDF"
 						}
 					],
@@ -113,8 +114,8 @@
 				},
 				{
 					"@type": "WebSite",
-					"name": "Document Localizer",
-					"url": "https://zimablue-io.github.io/document-localizer/",
+					"name": "Najimu",
+					"url": "%VITE_SITE_URL%/",
 					"inLanguage": "en"
 				},
 				{
@@ -124,7 +125,7 @@
 							"@type": "ListItem",
 							"position": 1,
 							"name": "Home",
-							"item": "https://zimablue-io.github.io/document-localizer/"
+							"item": "%VITE_SITE_URL%/"
 						}
 					]
 				}
@@ -135,34 +136,35 @@
 	<body>
 		<noscript>
 			<header>
-				<h1>Document Localizer - Free Offline PDF and Markdown AI Translator</h1>
+				<h1>Najimu - Free Offline PDF and Markdown Localizer</h1>
 			</header>
 			<main>
 				<p>
-					Document Localizer is a free, open-source desktop application for translating and
-					localizing PDF and Markdown documents between 100+ locales (English US, UK, AU, CA;
-					Spanish ES, MX, AR; Portuguese PT, BR; French FR, CA; German DE; and many more) using
-					local AI models. It runs entirely on your machine via Ollama, LM Studio, or llama.cpp.
-					Your documents never leave your computer.
+					Najimu is a free, open-source desktop application for localizing PDF and Markdown
+					documents across 100+ locales (English US, UK, AU, CA; Spanish ES, MX, AR; Portuguese
+					PT, BR; French FR, CA; German DE; and many more) using local AI models. It runs
+					entirely on your machine via Ollama, LM Studio, or llama.cpp. Your documents never
+					leave your computer.
 				</p>
 				<h2>Key Features</h2>
 				<ul>
-					<li>100% offline document translation between 100+ locales</li>
+					<li>100% offline document localization across 100+ locales</li>
 					<li>Privacy-first: nothing leaves your device</li>
 					<li>Works with any OpenAI-compatible local model (Llama 3, Mistral, Phi, Gemma, Qwen)</li>
 					<li>PDF and Markdown input and output</li>
 					<li>Side-by-side diff review with paragraph-level approve or reject</li>
+					<li>Translation memory that reuses approved wording across documents</li>
 					<li>Cross-platform: macOS, Windows, and Linux</li>
 				</ul>
 				<h2>Download</h2>
 				<p>
-					<a href="https://github.com/zimablue-io/document-localizer/releases/latest">
-						Download Document Localizer for macOS, Windows, or Linux
+					<a href="%VITE_REPO_URL%/releases/latest">
+						Download Najimu for macOS, Windows, or Linux
 					</a>
 				</p>
 				<h2>Source Code</h2>
 				<p>
-					<a href="https://github.com/zimablue-io/document-localizer">
+					<a href="%VITE_REPO_URL%">
 						View the project on GitHub
 					</a>
 				</p>

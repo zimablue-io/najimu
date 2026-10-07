@@ -5,7 +5,7 @@
 ### GitHub Issues
 
 For bugs, feature requests, and questions, please open an issue at:
-https://github.com/zimablue-io/document-localizer
+https://github.com/zimablue-io/najimu
 
 When reporting bugs, please include:
 - Operating system and version
@@ -15,13 +15,13 @@ When reporting bugs, please include:
 
 ### Community Support
 
-Document Localizer is maintained by zimablue-io. Response times may vary.
+Najimu is maintained by zimablue-io. Response times may vary.
 
 ## Known Limitations
 
 ### AI Backend Required
 
-Document Localizer requires a local AI server to function. It does not include or provide AI capabilities. You must set up one of:
+Najimu requires a local AI server to function. It does not include or provide AI capabilities. You must set up one of:
 
 - [Ollama](https://ollama.ai)
 - [LM Studio](https://lmstudio.ai)

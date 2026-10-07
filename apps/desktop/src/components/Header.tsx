@@ -1,4 +1,4 @@
-import { Button } from '@doclocalizer/ui'
+import { Button } from '@najimu/ui'
 import { ChevronDown, FolderOpen, History, Plus, RefreshCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -105,7 +105,7 @@ export default function Header({
 	return (
 		<header className="border-b border-border px-6 py-4 flex items-center justify-between">
 			<div className="flex items-center gap-4">
-				<h1 className="text-xl font-semibold">Document Localizer</h1>
+				<h1 className="text-xl font-semibold">Najimu</h1>
 
 				{/* Model Dropdown */}
 				{models && models.length > 0 ? (

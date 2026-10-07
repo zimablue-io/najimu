@@ -41,7 +41,7 @@ If you find a vulnerability and want to contribute a fix:
 
 ## Scope
 
-The Document Localizer desktop application processes files locally. The security of your AI backend (Ollama, LM Studio, etc.) is governed by their respective security policies.
+The Najimu desktop application processes files locally. The security of your AI backend (Ollama, LM Studio, etc.) is governed by their respective security policies.
 
 ## Out of Scope
 

@@ -1,4 +1,4 @@
-# @doclocalizer/desktop
+# @najimu/desktop
 
 Electron desktop application for document localization.
 
@@ -26,8 +26,8 @@ Cross-platform desktop app that localizes documents between any supported locale
 - Tailwind CSS v4
 - docutext (PDF parsing in renderer)
 - @huggingface/transformers (in-process embeddings, worker thread)
-- @doclocalizer/core (shared business logic)
-- @doclocalizer/ui (shared UI components)
+- @najimu/core (shared business logic)
+- @najimu/ui (shared UI components)
 
 ## Development
 
@@ -131,7 +131,7 @@ are otherwise added to the prompt as terminology examples.
 
 ## Settings Storage
 
-Stored in `~/Library/Application Support/document-localizer/`:
+Stored in `~/Library/Application Support/Najimu/`:
 - `settings.json` - API URL, models, chunk size, locales
 - `uploaded.json` - Source file library
 - `tasks.json` - Active processing tasks

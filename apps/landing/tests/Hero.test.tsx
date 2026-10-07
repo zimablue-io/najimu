@@ -45,14 +45,20 @@ describe('demo examples table', () => {
 describe('Hero demo', () => {
 	it('leads with one sentence and leaves the locale list off the first screen', () => {
 		render(<Hero selectedPlatform={null} onPlatformChange={() => {}} />)
-		expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Localize PDFs and Markdown on your machine')
+		expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Documents that finally fit in')
 		expect(
-			screen.getByText('A private translator for 100+ locales. Your files stay on this computer.')
+			screen.getByText('Najimu adapts PDFs and Markdown for 100+ locales. Your files stay on this computer.')
 		).toBeTruthy()
 		expect(screen.queryByText(/100% Offline/)).toBeNull()
 		expect(screen.queryByText(/Ollama/)).toBeNull()
 		expect(screen.queryByText(/US, UK, AU/)).toBeNull()
 		expect(screen.queryByRole('navigation', { name: 'Page sections' })).toBeNull()
+	})
+
+	it('names the product and explains what najimu means', () => {
+		render(<Hero selectedPlatform={null} onPlatformChange={() => {}} />)
+		expect(screen.getByText(/najimu/)).toBeTruthy()
+		expect(screen.getByText(/to fit in/)).toBeTruthy()
 	})
 
 	it('renders one tab per example', () => {

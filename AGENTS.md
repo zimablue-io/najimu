@@ -1,10 +1,10 @@
-# Document Localizer - Agent Guide
+# Najimu - Agent Guide
 
 ## Quick Orientation
 
 - **Project**: Electron desktop app for AI-powered document localization
 - **Stack**: React 18 + TypeScript + Tailwind CSS v4 + Electron 33
-- **Repo**: zimablue-io/document-localizer
+- **Repo**: zimablue-io/najimu
 - **Owner**: zimablue-io
 
 ## Task Routing
@@ -78,7 +78,7 @@ pnpm lint:fix             # Format and lint
 - Model weights download once and cache under Electron `userData/models`
 - If embeddings fail, translation continues without memory
 
-**Landing Page**: Marketing site at zimablue-io.github.io/document-localizer
+**Landing Page**: Marketing site at najimu.zimablue.io
 - Hero with animated demo
 - Features, How It Works, Setup Guide sections
 

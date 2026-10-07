@@ -1,4 +1,4 @@
-import { Button, ScrollArea, Sheet, SheetContent } from '@doclocalizer/ui'
+import { Button, ScrollArea, Sheet, SheetContent } from '@najimu/ui'
 import { formatDistanceToNow } from 'date-fns'
 import { Clock, FileText, Trash2, X } from 'lucide-react'
 

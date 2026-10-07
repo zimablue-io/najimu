@@ -29,18 +29,18 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@doclocalizer/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@doclocalizer/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@huggingface/transformers':
         specifier: 4.3.1
         version: 4.3.1(@types/node@22.19.17)
       '@mohtasham/md-to-docx':
         specifier: ^2.10.1
         version: 2.10.1(supports-color@8.1.1)
+      '@najimu/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@najimu/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0

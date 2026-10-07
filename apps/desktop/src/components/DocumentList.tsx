@@ -1,5 +1,5 @@
-import type { DocumentState } from '@doclocalizer/core'
-import { Button } from '@doclocalizer/ui'
+import type { DocumentState } from '@najimu/core'
+import { Button } from '@najimu/ui'
 import { ChevronDown, Eye, File, FileText, FileType, Square, Zap } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LocaleSelect, STATUS_COLORS, STATUS_LABELS, StatusIcon } from './document-helpers'

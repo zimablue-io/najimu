@@ -19,8 +19,8 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'),
-			'@doclocalizer/core': path.resolve(__dirname, '../../packages/core/src'),
-			'@doclocalizer/ui': path.resolve(__dirname, '../../packages/ui/src'),
+			'@najimu/core': path.resolve(__dirname, '../../packages/core/src'),
+			'@najimu/ui': path.resolve(__dirname, '../../packages/ui/src'),
 		},
 	},
 	build: {

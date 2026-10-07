@@ -1,10 +1,10 @@
-# @doclocalizer/landing
+# @najimu/landing
 
-Marketing landing page for Document Localizer.
+Marketing landing page for Najimu.
 
 ## Overview
 
-Single-page React application showcasing the Document Localizer desktop app. Features an animated hero section, feature highlights, interactive step-by-step guide, and LLM setup instructions.
+Single-page React application showcasing the Najimu desktop app. Features an animated hero section, feature highlights, interactive step-by-step guide, and LLM setup instructions.
 
 ## Sections
 

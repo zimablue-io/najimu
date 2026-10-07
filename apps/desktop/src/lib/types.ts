@@ -1,5 +1,5 @@
 /**
- * Shared TypeScript types for the Document Localizer desktop app.
+ * Shared TypeScript types for the Najimu desktop app.
  */
 
 /**

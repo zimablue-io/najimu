@@ -4,7 +4,7 @@ Last updated: April 2026
 
 ## Overview
 
-Document Localizer is a desktop application that processes documents entirely on your local machine. Your documents never leave your computer.
+Najimu is a desktop application that processes documents entirely on your local machine. Your documents never leave your computer.
 
 ## What We Collect
 
@@ -21,13 +21,13 @@ This data is anonymized and cannot be used to identify individual users.
 
 ### Desktop Application
 
-The Document Localizer desktop application does **not** collect any data. All document processing happens locally on your machine.
+The Najimu desktop application does **not** collect any data. All document processing happens locally on your machine.
 
 ## Third-Party Services
 
 ### Local AI Processing
 
-When you use Document Localizer, text from your documents is sent to a local AI server (Ollama, LM Studio, or llama.cpp) that you control. We have no access to this data.
+When you use Najimu, text from your documents is sent to a local AI server (Ollama, LM Studio, or llama.cpp) that you control. We have no access to this data.
 
 ### GitHub
 
@@ -53,4 +53,4 @@ Because we do not collect personal data, there is no data to access, correct, or
 ## Contact
 
 For privacy concerns, please open an issue at:
-https://github.com/zimablue-io/document-localizer
+https://github.com/zimablue-io/najimu

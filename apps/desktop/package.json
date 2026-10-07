@@ -1,18 +1,18 @@
 {
-  "name": "@doclocalizer/desktop",
+  "name": "@najimu/desktop",
   "version": "0.4.2",
-  "description": "AI-powered document localization for privacy-conscious teams",
+  "description": "Documents that fit in. Local, private localization for privacy-conscious teams.",
   "author": "zimablue-io",
   "license": "SEE LICENSE IN ../../LICENSE.md",
   "main": "dist-electron/main.cjs",
   "publish": {
     "provider": "github",
     "owner": "zimablue-io",
-    "repo": "document-localizer"
+    "repo": "najimu"
   },
   "build": {
-    "appId": "io.doclocalizer.app",
-    "productName": "Document Localizer",
+    "appId": "io.najimu.app",
+    "productName": "Najimu",
     "files": [
       "dist/**/*",
       "dist-electron/**/*"
@@ -38,15 +38,15 @@
     }
   },
   "scripts": {
-    "dev": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && concurrently \"vite\" \"node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron .\"",
+    "dev": "pnpm --filter @najimu/core build && pnpm --filter @najimu/ui build && concurrently \"vite\" \"node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron .\"",
     "dev:web": "vite",
-    "build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js",
+    "build": "pnpm --filter @najimu/core build && pnpm --filter @najimu/ui build && tsc --noEmit && vite build && node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js",
     "preview": "vite preview",
-    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder"
+    "electron:build": "pnpm --filter @najimu/core build && pnpm --filter @najimu/ui build && tsc --noEmit && vite build && node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder"
   },
   "dependencies": {
-    "@doclocalizer/core": "workspace:*",
-    "@doclocalizer/ui": "workspace:*",
+    "@najimu/core": "workspace:*",
+    "@najimu/ui": "workspace:*",
     "@huggingface/transformers": "4.3.1",
     "@mohtasham/md-to-docx": "^2.10.1",
     "date-fns": "^4.1.0",

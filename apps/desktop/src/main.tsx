@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import '@doclocalizer/ui/index.css'
+import '@najimu/ui/index.css'
 
 // Debug logging
 console.log('[App] Starting application...')

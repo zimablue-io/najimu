@@ -2,27 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 	<url>
-		<loc>https://zimablue-io.github.io/document-localizer/</loc>
-		<lastmod>2026-06-09</lastmod>
+		<loc>%VITE_SITE_URL%/</loc>
+		<lastmod>2026-10-07</lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>1.0</priority>
 		<image:image>
-			<image:loc>https://zimablue-io.github.io/document-localizer/images/og-image.png</image:loc>
-			<image:title>Document Localizer - AI PDF and Markdown Translator</image:title>
-			<image:caption>AI-powered offline document localization for 100+ locales</image:caption>
+			<image:loc>%VITE_SITE_URL%/images/og-image.png</image:loc>
+			<image:title>Najimu - Local, Private Document Localization</image:title>
+			<image:caption>Offline document localization for 100+ locales</image:caption>
 		</image:image>
 		<image:image>
-			<image:loc>https://zimablue-io.github.io/document-localizer/images/step%201%20-%20uploaded.png</image:loc>
+			<image:loc>%VITE_SITE_URL%/images/step%201%20-%20uploaded.png</image:loc>
 			<image:title>Upload PDF or Markdown files</image:title>
 			<image:caption>Select source and target locales for localization</image:caption>
 		</image:image>
 		<image:image>
-			<image:loc>https://zimablue-io.github.io/document-localizer/images/step%202%20-%20tasks.png</image:loc>
+			<image:loc>%VITE_SITE_URL%/images/step%202%20-%20tasks.png</image:loc>
 			<image:title>Review translations in side-by-side diff view</image:title>
 			<image:caption>Paragraph-level approve or reject before export</image:caption>
 		</image:image>
 		<image:image>
-			<image:loc>https://zimablue-io.github.io/document-localizer/images/step%203%20-%20processed.png</image:loc>
+			<image:loc>%VITE_SITE_URL%/images/step%203%20-%20processed.png</image:loc>
 			<image:title>Export approved documents</image:title>
 			<image:caption>Export localized documents as Markdown or PDF</image:caption>
 		</image:image>

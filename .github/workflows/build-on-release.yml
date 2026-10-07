@@ -55,7 +55,7 @@ jobs:
           "
 
       - name: Build Desktop App
-        run: pnpm --filter @doclocalizer/desktop electron:build
+        run: pnpm --filter @najimu/desktop electron:build
         env:
           NODE_ENV: production
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Platform, usePlatform } from '../hooks/usePlatform'
+import { licenseUrl } from '../lib/site'
 
 type ProviderStep = {
 	title: string
@@ -168,8 +169,8 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 			<div className="max-w-4xl mx-auto">
 				<h2 className="text-3xl font-bold text-center mb-4">Setup Your AI Backend</h2>
 				<p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-					Document Localizer works with any OpenAI-compatible API. Choose your preferred backend below and
-					follow the steps to get started.
+					Najimu works with any OpenAI-compatible API. Choose your preferred backend below and follow the
+					steps to get started.
 				</p>
 
 				{/* Horizontal Tab List */}
@@ -293,7 +294,7 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 					<div className="max-w-3xl mx-auto space-y-2">
 						<details className="group bg-card rounded-lg border border-border p-4">
 							<summary className="cursor-pointer font-medium list-none flex justify-between items-center">
-								<span>Is Document Localizer really free?</span>
+								<span>Is Najimu really free?</span>
 								<span
 									className="text-muted-foreground group-open:rotate-180 transition-transform"
 									aria-hidden="true"
@@ -302,11 +303,8 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 								</span>
 							</summary>
 							<p className="mt-2 text-sm text-muted-foreground">
-								Yes. Document Localizer is free for personal and non-commercial use. See the{' '}
-								<a
-									href="https://github.com/zimablue-io/document-localizer/blob/main/LICENSE.md"
-									className="text-primary hover:underline"
-								>
+								Yes. Najimu is free for personal and non-commercial use. See the{' '}
+								<a href={licenseUrl} className="text-primary hover:underline">
 									license
 								</a>{' '}
 								for commercial-use details.

@@ -1,12 +1,13 @@
 {
-	"name": "@doclocalizer/landing",
+	"name": "@najimu/landing",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
 	"license": "SEE LICENSE IN ../../LICENSE.md",
 	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
+		"seo": "node scripts/render-seo.mjs",
+		"dev": "node scripts/render-seo.mjs && vite",
+		"build": "node scripts/render-seo.mjs && vite build",
 		"preview": "vite preview"
 	},
 	"dependencies": {

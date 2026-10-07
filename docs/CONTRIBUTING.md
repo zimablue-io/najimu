@@ -1,11 +1,11 @@
-# Contributing to Document Localizer
+# Contributing to Najimu
 
 Thank you for your interest in contributing!
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/document-localizer.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/najimu.git`
 3. Install dependencies: `pnpm install`
 4. Start developing:
    - Desktop app: `cd apps/desktop && pnpm dev`
@@ -14,7 +14,7 @@ Thank you for your interest in contributing!
 ## Project Structure
 
 ```
-document-localizer/
+najimu/
 ├── apps/
 │   ├── desktop/          # Electron app (port 1420)
 │   │   ├── electron/     # Main process

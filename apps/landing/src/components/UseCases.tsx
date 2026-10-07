@@ -53,8 +53,7 @@ export default function UseCases() {
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the Use Cases That Matter</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						Whether you're translating sensitive legal documents, developer manuals, or full book
-						manuscripts — Document Localizer keeps your data local and gives you a reviewable draft to start
-						from.
+						manuscripts — Najimu keeps your data local and gives you a reviewable draft to start from.
 					</p>
 				</div>
 
@@ -81,7 +80,7 @@ export default function UseCases() {
 				{/* Bottom CTA */}
 				<div className="mt-16 text-center">
 					<p className="text-muted-foreground mb-4">
-						Don't see your use case? Document Localizer supports any PDF or Markdown content.
+						Don't see your use case? Najimu supports any PDF or Markdown content.
 					</p>
 					<a
 						href="#setup"

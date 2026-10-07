@@ -62,7 +62,7 @@ export default function VsCompetitors() {
 		<section id="vs-competitors" className="py-12 md:py-16 px-4 md:px-8">
 			<div className="max-w-6xl mx-auto">
 				<div className="text-center mb-16">
-					<h2 className="text-3xl md:text-4xl font-bold mb-4">Document Localizer vs. Cloud Translators</h2>
+					<h2 className="text-3xl md:text-4xl font-bold mb-4">Najimu vs. Cloud Translators</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 						DeepL and Google Translate are fast for quick sentences — but when your documents are sensitive,
 						expensive, or complex, local processing wins.
@@ -74,7 +74,7 @@ export default function VsCompetitors() {
 						<thead>
 							<tr className="border-b-2 border-border">
 								<th className="pb-4 pr-8 text-sm font-medium text-muted-foreground w-1/3">Feature</th>
-								<th className="pb-4 px-8 text-lg font-bold text-primary">Document Localizer</th>
+								<th className="pb-4 px-8 text-lg font-bold text-primary">Najimu</th>
 								<th className="pb-4 px-4 text-lg font-semibold text-foreground">DeepL</th>
 								<th className="pb-4 px-4 text-lg font-semibold text-foreground">Google Translate</th>
 							</tr>

@@ -1,5 +1,5 @@
-import type { DocumentState } from '@doclocalizer/core'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@doclocalizer/ui'
+import type { DocumentState } from '@najimu/core'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@najimu/ui'
 import { AlertTriangle, CheckCircle2, Clock, FileText, Loader2, XCircle } from 'lucide-react'
 
 type ExtendedStatus = DocumentState['status'] | 'rejected'

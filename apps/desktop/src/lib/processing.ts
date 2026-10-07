@@ -1,7 +1,7 @@
 /**
  * Document processing logic - parallel processing, AI calls, and response cleanup.
  */
-import { convertPdfToMarkdown } from '@doclocalizer/core'
+import { convertPdfToMarkdown } from '@najimu/core'
 import { DISK_WRITE_INTERVAL, MEMORY_MATCH_LIMIT, MEMORY_SIMILARITY_THRESHOLD, PROCESSING_CONCURRENCY } from './config'
 import { embedTexts } from './embeddings'
 import { getOutputFileName, getOutputPath, isPdfPath, readPdfFile, readTextFile } from './files'
