@@ -1,13 +1,6 @@
-import { BookOpen, Briefcase, Code, FileText, Shield, Zap } from 'lucide-react'
+import { BookOpen, Briefcase, Code, FileText, Zap } from 'lucide-react'
 
 const useCases = [
-	{
-		icon: Shield,
-		title: 'Legal & Compliance',
-		description:
-			'Draft contracts, NDAs, and regulatory filings without sending sensitive client data to third-party cloud servers. Output is machine-generated and needs qualified review before it is relied on.',
-		color: 'text-blue-500',
-	},
 	{
 		icon: Code,
 		title: 'Technical Documentation',
@@ -26,7 +19,7 @@ const useCases = [
 		icon: Briefcase,
 		title: 'Enterprise Internal Docs',
 		description:
-			'Localize internal wikis, SOPs, and training materials. Fully air-gapped — runs on your GPU, behind your firewall, with zero data leaving your network.',
+			'Localize internal wikis, SOPs, and training materials. Runs on your GPU, behind your firewall, with zero document data leaving your network.',
 		color: 'text-amber-500',
 	},
 	{
@@ -52,8 +45,8 @@ export default function UseCases() {
 				<div className="text-center mb-16">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the Use Cases That Matter</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						Whether you're translating sensitive legal documents, developer manuals, or full book
-						manuscripts — Najimu keeps your data local and gives you a reviewable draft to start from.
+						Whether you're translating product documentation, developer manuals, or full book manuscripts —
+						Najimu keeps your data local and gives you a reviewable draft to start from.
 					</p>
 				</div>
 

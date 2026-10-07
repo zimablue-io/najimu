@@ -23,10 +23,9 @@ Adapts PDF and Markdown documents between locales (languages and regional varian
 
 1. **Content Localization**: Convert documentation, marketing copy, and product pages for international audiences
 2. **Regional Adaptation**: Transform content between regional variants (en-US to en-GB, es-ES to es-MX, fr-FR to fr-CA)
-3. **Privacy-Sensitive Translation**: Translate confidential documents (legal, medical, financial) without sending data to third-party APIs
-4. **Offline Workflows**: Translate documents on air-gapped machines or in restricted-network environments
-5. **Cost-Free Translation**: Avoid per-character cloud translation costs by running local models
-6. **Publishing Preparation**: Adapt content for specific regional markets before publication
+3. **Restricted Networks**: Translate documents on machines that cannot reach third-party APIs
+4. **Cost-Free Translation**: Avoid per-character cloud translation costs by running local models
+5. **Publishing Preparation**: Adapt content for specific regional markets before publication
 
 ## Technical Specifications
 
@@ -41,17 +40,7 @@ Adapts PDF and Markdown documents between locales (languages and regional varian
 - **Network access required**: No (except to download the app and models)
 - **Telemetry**: None
 
-## Comparison
-
-Najimu vs. Cloud Translators (DeepL, Google Translate, Microsoft Translator):
-
-- **Data Privacy**: All processing happens locally on your GPU. Your documents never leave your machine. Cloud translators send every document to their servers.
-- **Cost**: Free and open source. Run on your own hardware. Cloud translators use subscription and metered per-character billing.
-- **Formatting Retention**: Markdown structure carries through on Markdown and Word export. Code blocks and tables are dropped on PDF export. Cloud translators often break complex layouts and code formatting.
-- **Custom Models**: Plug in any OpenAI-compatible local LLM (Llama 3, Mistral, Gemma, Qwen, etc.). Cloud translators offer black-box models with zero customization.
-- **Diff & Review**: Built-in side-by-side diff editor lets you review and approve translations paragraph-by-paragraph before export. Cloud translators give you raw output with no review workflow.
-- **Terminology Memory**: Approved translations are recalled on later documents so wording stays consistent. Cloud translators start from zero on every file.
-- **Air-Gapped**: Works 100% offline with no internet connection required. Cloud translators require a constant connection.
+## Positioning
 
 Najimu is NOT:
 - A CAT tool (Computer-Assisted Translation, like Trados or memoQ) - it is a fully automated AI translator
@@ -60,7 +49,7 @@ Najimu is NOT:
 - A general-purpose LLM frontend - it is purpose-built for document localization with diff review
 
 Najimu IS:
-- A privacy-first alternative to DeepL, Google Translate, and Microsoft Translator for users who cannot send documents to third-party APIs
+- A privacy-first local translator for users who cannot send documents to third-party APIs
 - A free alternative to commercial CAT tools for one-off document translation
 - A consumer of any OpenAI-compatible local model server (Ollama, LM Studio, llama.cpp, vLLM, etc.)
 

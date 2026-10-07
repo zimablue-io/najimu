@@ -112,4 +112,3 @@ cd packages/core && pnpm build
 | Privacy Policy | [docs/PRIVACY.md](./docs/PRIVACY.md) |
 | Support | [docs/SUPPORT.md](./docs/SUPPORT.md) |
 | Security | [docs/SECURITY.md](./docs/SECURITY.md) |
-dummy

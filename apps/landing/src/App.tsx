@@ -6,7 +6,6 @@ import Navigation from './components/Navigation'
 import SetupGuide from './components/SetupGuide'
 import StepViewer from './components/StepViewer'
 import UseCases from './components/UseCases'
-import VsCompetitors from './components/VsCompetitors'
 import { Platform } from './hooks/usePlatform'
 
 export default function App() {
@@ -24,9 +23,6 @@ export default function App() {
 			</div>
 			<div id="how-it-works">
 				<StepViewer />
-			</div>
-			<div id="vs-competitors">
-				<VsCompetitors />
 			</div>
 			<div id="setup">
 				<SetupGuide selectedPlatform={selectedPlatform} />

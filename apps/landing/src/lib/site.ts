@@ -18,3 +18,4 @@ export const REPO_URL = trimTrailingSlash(import.meta.env.VITE_REPO_URL)
 
 export const releasesUrl = `${REPO_URL}/releases/latest`
 export const licenseUrl = `${REPO_URL}/blob/main/LICENSE.md`
+export const privacyUrl = `${REPO_URL}/blob/main/docs/PRIVACY.md`

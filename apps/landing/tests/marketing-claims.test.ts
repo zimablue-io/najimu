@@ -14,10 +14,9 @@ const LANDING = join(__dirname, '..')
 const read = (rel: string) => readFileSync(join(LANDING, rel), 'utf8')
 
 const useCases = read('src/components/UseCases.tsx')
-const vsCompetitors = read('src/components/VsCompetitors.tsx')
 const llms = read('public/llms.txt')
 
-const allCopy = `${useCases}\n${vsCompetitors}\n${llms}`
+const allCopy = `${useCases}\n${llms}`
 
 describe('capability claims match the implementation', () => {
 	it('does not claim syntax highlighting, which the app does not implement', () => {

@@ -1,4 +1,4 @@
-import { Briefcase, LayoutGrid, ListChecks, Menu, Server, Swords, X } from 'lucide-react'
+import { Briefcase, LayoutGrid, ListChecks, Menu, Server, X } from 'lucide-react'
 import { useState } from 'react'
 import { useActiveSection } from '../hooks/useActiveSection'
 
@@ -6,7 +6,6 @@ const navItems = [
 	{ id: 'features', icon: LayoutGrid, label: 'Features' },
 	{ id: 'use-cases', icon: Briefcase, label: 'Use Cases' },
 	{ id: 'how-it-works', icon: ListChecks, label: 'How It Works' },
-	{ id: 'vs-competitors', icon: Swords, label: 'Compare' },
 	{ id: 'setup', icon: Server, label: 'Setup' },
 ]
 

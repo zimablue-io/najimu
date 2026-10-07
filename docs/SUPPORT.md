@@ -29,7 +29,7 @@ Najimu requires a local AI server to function. It does not include or provide AI
 
 ### Platform Support
 
-Currently available for **macOS only**. Windows and Linux builds are planned but not yet available.
+Available for **macOS, Windows, and Linux**. The macOS build is a `.dmg`, the Windows build is an NSIS installer, and the Linux build is an AppImage. All three come from the same release.
 
 ### Document Formats
 

@@ -1,4 +1,4 @@
-import { REPO_URL } from '../lib/site'
+import { privacyUrl, REPO_URL } from '../lib/site'
 import { GitHubIcon } from './Icons'
 
 export default function Footer() {
@@ -12,6 +12,9 @@ export default function Footer() {
 				>
 					<GitHubIcon className="w-4 h-4" />
 					View on GitHub
+				</a>
+				<a href={privacyUrl} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+					Privacy
 				</a>
 				<div className="text-sm text-muted-foreground">
 					Built with 🩵 by{' '}

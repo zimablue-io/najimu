@@ -18,7 +18,6 @@ apps/landing/src/
 │   ├── StepViewer.tsx  # How It Works (scroll-driven desktop, tabs mobile)
 │   ├── SetupGuide.tsx  # LLM setup instructions (tabs: Ollama, LM Studio, llama.cpp)
 │   ├── UseCases.tsx
-│   ├── VsCompetitors.tsx
 │   ├── Navigation.tsx  # Sidebar nav (desktop), hamburger (mobile)
 │   └── Footer.tsx
 ├── hooks/
