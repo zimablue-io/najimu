@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/zimablue-io/najimu/compare/v0.6.0...v0.6.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* **build:** allow the core-js postinstall so CI installs ([2511504](https://github.com/zimablue-io/najimu/commit/2511504673f2ae972dd0990ea538306ffffc3614))
+
 ## 0.6.0 (2026-10-07)
 
 First release under the Najimu name, and the first published from this
