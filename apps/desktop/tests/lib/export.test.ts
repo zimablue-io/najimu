@@ -10,6 +10,12 @@ describe('lib/export', () => {
 		it('returns .md for markdown format', () => {
 			expect(getFileExtension('md')).toBe('.md')
 		})
+
+		// contentToDocx returns an OOXML package. Naming it .doc with the legacy
+		// mime is what makes Word refuse to open the file.
+		it('returns .docx for the Word format', () => {
+			expect(getFileExtension('doc')).toBe('.docx')
+		})
 	})
 
 	describe('getMimeType', () => {
@@ -19,6 +25,10 @@ describe('lib/export', () => {
 
 		it('returns text/markdown for markdown format', () => {
 			expect(getMimeType('md')).toBe('text/markdown')
+		})
+
+		it('returns the OOXML mime for the Word format', () => {
+			expect(getMimeType('doc')).toBe('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
 		})
 	})
 
@@ -33,6 +43,12 @@ describe('lib/export', () => {
 			const filter = getFilterForFormat('md')
 			expect(filter.name).toBe('Markdown')
 			expect(filter.extensions).toEqual(['md'])
+		})
+
+		it('returns a docx filter for the Word format', () => {
+			const filter = getFilterForFormat('doc')
+			expect(filter.name).toBe('Word Document')
+			expect(filter.extensions).toEqual(['docx'])
 		})
 	})
 

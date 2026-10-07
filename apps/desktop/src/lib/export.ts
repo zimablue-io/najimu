@@ -9,37 +9,33 @@ export interface ExportOptions {
 	defaultFilename: string
 }
 
+/**
+ * One row per format. The extension, mime and dialog name each existed in three
+ * separate switches, which is how the Word format ended up writing an OOXML
+ * package under a `.doc` extension with the legacy `application/msword` mime,
+ * a combination Word refuses to open.
+ */
+const FORMATS: Record<ExportFormat, { extension: string; mime: string; name: string }> = {
+	md: { extension: '.md', mime: 'text/markdown', name: 'Markdown' },
+	pdf: { extension: '.pdf', mime: 'application/pdf', name: 'PDF' },
+	doc: {
+		extension: '.docx',
+		mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		name: 'Word Document',
+	},
+}
+
 export function getFileExtension(format: ExportFormat): string {
-	switch (format) {
-		case 'pdf':
-			return '.pdf'
-		case 'doc':
-			return '.doc'
-		default:
-			return '.md'
-	}
+	return FORMATS[format].extension
 }
 
 export function getMimeType(format: ExportFormat): string {
-	switch (format) {
-		case 'pdf':
-			return 'application/pdf'
-		case 'doc':
-			return 'application/msword'
-		default:
-			return 'text/markdown'
-	}
+	return FORMATS[format].mime
 }
 
 export function getFilterForFormat(format: ExportFormat): { name: string; extensions: string[] } {
-	switch (format) {
-		case 'pdf':
-			return { name: 'PDF', extensions: ['pdf'] }
-		case 'doc':
-			return { name: 'Word Document', extensions: ['doc'] }
-		default:
-			return { name: 'Markdown', extensions: ['md'] }
-	}
+	const { extension, name } = FORMATS[format]
+	return { name, extensions: [extension.replace(/^\./, '')] }
 }
 
 export function markdownToPlainText(markdown: string): string {

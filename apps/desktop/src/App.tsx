@@ -9,7 +9,7 @@ import Header from './components/Header'
 import HistoryPanel from './components/HistoryPanel'
 import SettingsModal from './components/SettingsModal'
 import { useDocuments } from './hooks/useDocuments'
-import { contentToDocx, contentToPdf, ExportFormat, getFileExtension } from './lib/export'
+import { contentToDocx, contentToPdf, ExportFormat, getFileExtension, getFilterForFormat } from './lib/export'
 import { ALL_LOCALES } from './lib/locales'
 import { createProcessingOutput, extractMarkdown, processDocument, recordApprovedDocument } from './lib/processing'
 import { LOCALE_DETECTION_PROMPT } from './lib/prompts'
@@ -499,13 +499,7 @@ export default function App() {
 
 				const savePath = await window.electron.saveFile({
 					defaultPath: defaultFilename,
-					filters: [
-						format === 'pdf'
-							? { name: 'PDF', extensions: ['pdf'] }
-							: format === 'doc'
-								? { name: 'Word Document', extensions: ['doc'] }
-								: { name: 'Markdown', extensions: ['md'] },
-					],
+					filters: [getFilterForFormat(format)],
 				})
 
 				if (!savePath) return

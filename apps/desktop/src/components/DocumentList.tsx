@@ -524,7 +524,7 @@ export default function DocumentList({
 															>
 																<File className="w-5 h-5 text-primary shrink-0" />
 																<span className="whitespace-nowrap">
-																	Word Document (.doc)
+																	Word Document (.docx)
 																</span>
 															</button>
 														</div>
