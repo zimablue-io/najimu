@@ -1,6 +1,36 @@
 # Changelog
 
-## [0.6.0](https://github.com/zimablue-io/najimu/compare/v0.5.0...v0.6.0) (2026-10-07)
+## 0.5.0 (2026-10-07)
+
+First release under the Najimu name, and the first published from this
+repository's current release setup.
+
+### What this release is
+
+The project was renamed from `document-localizer` to **Najimu** (馴染む, "to fit
+in"). The app adapts documents to their target locale rather than only
+translating between languages, so en-US to en-GB changes "soccer" to "football"
+and "color" to "colour" with no cross-language step at all.
+
+Version history before this entry was reset. Earlier tags (`v0.1.0`-`v0.3.1`
+and `desktop-v0.2.0`-`desktop-v0.4.3`) were deleted, because a misconfigured
+`skip-github-release` had suppressed tag creation entirely, so no release was
+ever actually cut from them.
+
+### Notable changes in this release
+
+- **Translation memory**: EmbeddingGemma 2 runs in-process in a worker thread.
+  No embedding server to configure, and inference never blocks the UI.
+- **Word export**: documents are written as real OOXML `.docx`, not renamed
+  HTML.
+- **Auto-update**: the updater publishes to `zimablue-io/najimu`.
+- **Landing page**: Vercel Speed Insights, and copy no longer claims
+  regulated-domain handling or compares against named competitors.
+
+### Upgrade note
+
+The app id changed from `io.doclocalizer.app` to `io.najimu.app`, so macOS will
+treat this as a separate application and existing settings will not carry over.
 
 
 ### Features
