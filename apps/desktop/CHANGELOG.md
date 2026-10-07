@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0 (2026-10-07)
+## 0.6.0 (2026-10-07)
 
 First release under the Najimu name, and the first published from this
 repository's current release setup.
@@ -81,7 +81,7 @@ treat this as a separate application and existing settings will not carry over.
 * update localization quality tests for better string handling and consistency ([8ee79d5](https://github.com/zimablue-io/najimu/commit/8ee79d51ccfb75cfb06002ef207af5c128e84a05))
 * update publish owner to zimablue-io org ([ecb8c44](https://github.com/zimablue-io/najimu/commit/ecb8c4425d7d3c5f77b83d7c62e5c7f7d5e3f33a))
 
-## 0.5.0 (2026-10-07)
+## 0.6.0 (2026-10-07)
 
 
 ### Features

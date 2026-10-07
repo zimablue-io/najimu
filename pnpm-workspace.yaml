@@ -9,6 +9,10 @@ allowBuilds:
   # postinstall download is unnecessary and must not run.
   onnxruntime-node: false
   protobufjs: false
+  # Transitive via jspdf, which the desktop app uses for PDF export. Its
+  # postinstall only prints a funding banner; without an entry here pnpm aborts
+  # the install under ERR_PNPM_IGNORED_BUILDS and no binary is ever built.
+  core-js: true
 
 minimumReleaseAgeExclude:
   - '@huggingface/transformers@4.3.1'
