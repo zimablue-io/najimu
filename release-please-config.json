@@ -1,9 +1,9 @@
 {
   "include-component-in-tag": false,
+  "force-tag-creation": true,
   "packages": {
     "apps/desktop": {
-      "release-type": "node",
-      "skip-github-release": true
+      "release-type": "node"
     }
   }
 }
