@@ -110,3 +110,28 @@ pnpm build:landing              # Production build
 4. **Marketing copy is tested** - `tests/marketing-claims.test.ts` asserts every
    capability claim against the code that implements it. Do not add a claim the
    implementation cannot back.
+
+## Layout Invariants
+
+Enforced by tests, so a violation fails rather than drifting.
+
+| Rule | Enforced by |
+|------|-------------|
+| Every full-width `<section>`/`<footer>` uses `section-gutter` and nothing else for horizontal padding | `tests/section-gutter.test.tsx` |
+| `--nav-gutter` is wider than the expanded sidebar pill | `tests/navigation-gutter.test.tsx` |
+| No cumulative layout shift at 320/390/768/1024/1440/1920 | `check:cls` (real browser) |
+
+Rules that are easy to break by accident:
+
+1. **Padding lives in one place.** `section-gutter` is an `@utility` in
+   `index.css`, built from `--section-gutter` and `--nav-gutter`. Do not add
+   `px-*`, `pl-*` or `pr-*` to a full-bleed section. The values are derived, so
+   the sections and the sidebar cannot drift apart.
+2. **Tab switches must not move anything.** Anything with swapping tabs uses
+   `useStableHeight` rather than a hardcoded height. Pass every input that changes
+   what the variants measure as its `deps`, or the reservation goes stale. This
+   bit once: `usePlatform` resolves in an effect, so the first measurement ran
+   against the placeholder platform and the real platform's taller steps
+   overlapped the section below.
+3. **Reserve intrinsic dimensions on images** (`width`/`height` plus `decoding`),
+   or the image shifts the page as it loads.

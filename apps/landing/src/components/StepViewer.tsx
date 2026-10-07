@@ -4,6 +4,9 @@ interface Step {
 	id: string
 	title: string
 	image: string
+	/** Intrinsic pixel size, so the browser reserves the aspect-ratio box before the image loads. */
+	width: number
+	height: number
 	description: string
 }
 
@@ -12,6 +15,8 @@ const steps: Step[] = [
 		id: '1',
 		title: 'Upload Documents',
 		image: '/images/step 1 - uploaded.png',
+		width: 790,
+		height: 179,
 		description:
 			'Select PDF or Markdown files to add to your source library. Choose source and target locales for each document, then click Process to begin.',
 	},
@@ -19,6 +24,8 @@ const steps: Step[] = [
 		id: '2',
 		title: 'Monitor & Review',
 		image: '/images/step 2 - tasks.png',
+		width: 777,
+		height: 409,
 		description:
 			'Track processing progress with real-time status updates. When processing completes, click "Review" to inspect changes in a side-by-side diff view with paragraph-level editing, approve/reject controls.',
 	},
@@ -26,6 +33,8 @@ const steps: Step[] = [
 		id: '3',
 		title: 'Export Results',
 		image: '/images/step 3 - processed.png',
+		width: 781,
+		height: 312,
 		description:
 			'View approved and rejected outputs. Export completed documents as Markdown or PDF with one click.',
 	},
@@ -71,7 +80,7 @@ export default function StepViewer() {
 	}
 
 	return (
-		<section className="py-12 md:py-20 px-6 border-t border-border">
+		<section className="section-gutter py-12 md:py-20 border-t border-border">
 			<div className="max-w-6xl mx-auto">
 				<h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">How It Works</h2>
 
@@ -118,22 +127,29 @@ export default function StepViewer() {
 						</nav>
 					</div>
 
-					{/* Right Content - Dynamic Area */}
-					<div className="flex-1 min-h-[400px] md:min-h-[500px]">
+					{/* Right Content - Dynamic Area
+					    All three panels share one grid cell so the column is as tall as the
+					    tallest step at all times. Toggling `hidden` instead would resize
+					    the column on every scroll-driven step change. */}
+					<div className="grid flex-1 min-h-[400px] md:min-h-[500px]">
 						{steps.map((step, index) => (
 							<div
 								key={step.id}
 								ref={(el) => {
 									stepRefs.current[index] = el
 								}}
-								className={`transition-opacity duration-300 ${
-									activeStep === index ? 'opacity-100' : 'opacity-0 hidden'
+								aria-hidden={index !== activeStep}
+								className={`col-start-1 row-start-1 transition-opacity duration-300 ${
+									index === activeStep ? 'opacity-100' : 'opacity-0 pointer-events-none'
 								}`}
 							>
 								<div className="bg-card rounded-xl overflow-hidden border border-border">
 									<img
 										src={step.image}
 										alt={`${step.title} screenshot`}
+										width={step.width}
+										height={step.height}
+										decoding="async"
 										className="w-full h-auto object-contain"
 									/>
 								</div>

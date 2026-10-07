@@ -5,17 +5,31 @@ interface LocaleDemoProps {
 	example: DemoExample
 }
 
+/**
+ * Every segment carries the same padding, changed or not.
+ *
+ * Giving only the highlighted segments negative margins made the text position
+ * depend on which segments happened to be marked, so switching examples nudged
+ * the text by a pixel. Colour alone now distinguishes a changed segment.
+ */
+const SEGMENT_CLASS = 'px-0.5 rounded'
+
 /** Literal class names so Tailwind's scanner can see them. */
 const CHANGE_CLASS: Record<'red' | 'green', string> = {
-	red: 'bg-red-900/50 text-red-300 px-0.5 rounded mx-[-1px]',
-	green: 'bg-green-900/50 text-green-300 px-0.5 rounded mx-[-1px]',
+	red: 'bg-red-900/50 text-red-300',
+	green: 'bg-green-900/50 text-green-300',
 }
 
+/**
+ * inline-block so each segment wraps as a whole unit. With inline spans the glyphs
+ * inside a segment landed on different lines for a short versus a long sentence,
+ * moving text inside the reserved box.
+ */
 function SegmentedText({ segments, hue }: { segments: DemoSegment[]; hue: 'red' | 'green' }) {
 	return (
 		<p className="font-mono text-sm leading-relaxed">
 			{segments.map((segment, i) => (
-				<span key={i} className={segment.changed ? CHANGE_CLASS[hue] : undefined}>
+				<span key={i} className={`inline-block ${SEGMENT_CLASS} ${segment.changed ? CHANGE_CLASS[hue] : ''}`}>
 					{segment.text}
 				</span>
 			))}
@@ -26,8 +40,7 @@ function SegmentedText({ segments, hue }: { segments: DemoSegment[]; hue: 'red' 
 export default function LocaleDemo({ example }: LocaleDemoProps) {
 	return (
 		<div className="relative md:pl-6 md:pr-6">
-			{/* Decorative icons sit in the surrounding gutter (not behind the opaque card) and are
-			    offset far enough that they never cover the tab strip or its caption. */}
+			{/* Decorative, offset into the surrounding gutter so they never cover the card. */}
 			<div className="absolute top-14 -left-4 animate-float-delayed hidden md:block pointer-events-none">
 				<div className="w-14 h-18 bg-card rounded-lg border border-border shadow-lg flex items-center justify-center">
 					<FileText className="w-7 h-7 text-primary" />
@@ -44,12 +57,26 @@ export default function LocaleDemo({ example }: LocaleDemoProps) {
 				</div>
 			</div>
 
-			<div className="relative bg-card/80 backdrop-blur rounded-2xl border border-border p-4 md:p-6 shadow-2xl">
-				<div className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-					<span className="w-2 h-2 rounded-full bg-red-400" />
+			{/* Each part reads back the tallest height measured across the examples, so a card
+			    that resizes cannot slide the content under it. */}
+			<div
+				data-part="card"
+				className="relative bg-card/80 backdrop-blur rounded-2xl border border-border p-4 md:p-6 shadow-2xl"
+				style={{ minHeight: 'var(--demo-card-h)' }}
+			>
+				<div
+					data-part="source-label"
+					style={{ minHeight: 'var(--demo-source-label-h)' }}
+					className="text-xs text-muted-foreground mb-3 flex items-center gap-2"
+				>
+					<span className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
 					Original ({example.sourceName})
 				</div>
-				<div className="bg-[#1a1a2e] rounded-lg p-3 md:p-4 mb-3 md:mb-4">
+				<div
+					data-part="source-box"
+					style={{ minHeight: 'var(--demo-source-box-h)' }}
+					className="bg-[#1a1a2e] rounded-lg p-3 md:p-4 mb-3 md:mb-4"
+				>
 					<SegmentedText segments={example.source} hue="red" />
 				</div>
 
@@ -76,11 +103,19 @@ export default function LocaleDemo({ example }: LocaleDemoProps) {
 					</div>
 				</div>
 
-				<div className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-					<span className="w-2 h-2 rounded-full bg-green-400" />
+				<div
+					data-part="target-label"
+					style={{ minHeight: 'var(--demo-target-label-h)' }}
+					className="text-xs text-muted-foreground mb-3 flex items-center gap-2"
+				>
+					<span className="w-2 h-2 rounded-full bg-green-400 shrink-0" />
 					Localized ({example.targetName})
 				</div>
-				<div className="bg-[#1a1a2e] rounded-lg p-3 md:p-4">
+				<div
+					data-part="target-box"
+					style={{ minHeight: 'var(--demo-target-box-h)' }}
+					className="bg-[#1a1a2e] rounded-lg p-3 md:p-4"
+				>
 					<SegmentedText segments={example.target} hue="green" />
 				</div>
 			</div>

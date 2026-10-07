@@ -1,143 +1,39 @@
 import { useState } from 'react'
-import { Platform, usePlatform } from '../hooks/usePlatform'
+import { type Platform, usePlatform } from '../hooks/usePlatform'
+import { useStableHeight } from '../hooks/useStableHeight'
 import { licenseUrl } from '../lib/site'
-
-type ProviderStep = {
-	title: string
-	command?: string | null
-	description: string
-	platforms?: Platform[]
-}
-
-interface Provider {
-	id: string
-	name: string
-	installUrl: string
-	defaultPort: string
-	defaultApiUrl: string
-	steps: ProviderStep[]
-}
-
-const providers: Provider[] = [
-	{
-		id: 'ollama',
-		name: 'Ollama',
-		installUrl: 'https://ollama.ai',
-		defaultPort: '11434',
-		defaultApiUrl: 'http://localhost:11434/v1',
-		steps: [
-			{
-				title: 'Install Ollama',
-				command: 'brew install ollama',
-				description: 'Or download from ollama.ai/download',
-				platforms: ['macos'],
-			},
-			{
-				title: 'Install Ollama',
-				command: null,
-				description: 'Download from ollama.ai/download - available for macOS, Windows, and Linux.',
-				platforms: ['windows', 'linux'],
-			},
-			{
-				title: 'Start the server',
-				command: 'ollama serve',
-				description: 'Runs automatically on port 11434. Keep this terminal open while using the app.',
-			},
-			{
-				title: 'Pull a model',
-				command: 'ollama pull llama3.2:3b',
-				description: 'Downloads the model (~2GB). Choose any model from ollama.ai/library.',
-			},
-			{
-				title: 'Configure in app',
-				description: 'Enter API URL http://localhost:11434/v1 and model name (e.g., llama3.2:3b) in Settings.',
-			},
-		],
-	},
-	{
-		id: 'lmstudio',
-		name: 'LM Studio',
-		installUrl: 'https://lmstudio.ai',
-		defaultPort: '1234',
-		defaultApiUrl: 'http://localhost:1234/v1',
-		steps: [
-			{
-				title: 'Download LM Studio',
-				command: null,
-				description: 'Get it from lmstudio.ai - available for macOS, Windows, and Linux.',
-			},
-			{
-				title: 'Download a model',
-				description:
-					'Use the search bar to find and download a model (e.g., "llama 3.2 3b"). The model downloads to your local machine.',
-			},
-			{
-				title: 'Start local server',
-				description:
-					'Click the "Local Server" tab on the left. Click "Start Server" - it defaults to http://localhost:1234/v1.',
-			},
-			{
-				title: 'Configure in app',
-				description:
-					'Enter API URL http://localhost:1234/v1 and model name (from the model you downloaded) in Settings.',
-			},
-		],
-	},
-	{
-		id: 'llamacpp',
-		name: 'llama.cpp',
-		installUrl: 'https://github.com/ggerganov/llama.cpp',
-		defaultPort: '8080',
-		defaultApiUrl: 'http://localhost:8080/v1',
-		steps: [
-			{
-				title: 'Install llama.cpp',
-				command: 'brew install llama.cpp',
-				description: 'Builds the server binary. Requires CMake and build tools.',
-				platforms: ['macos'],
-			},
-			{
-				title: 'Install llama.cpp',
-				command: null,
-				description:
-					'Follow build instructions at github.com/ggerganov/llama.cpp. Requires CMake and build tools.',
-				platforms: ['windows', 'linux'],
-			},
-			{
-				title: 'Download a model',
-				description:
-					'Download a GGUF model file from Hugging Face (e.g., TheBloke/Mistral-7B-Instruct-v0.2-GGUF).',
-			},
-			{
-				title: 'Start the server',
-				command: 'llama-server -m model.gguf -c 4096 -port 8080',
-				description: 'Adjust model path and context size as needed. Port 8080 is default.',
-			},
-			{
-				title: 'Configure in app',
-				description:
-					'Enter API URL http://localhost:8080/v1 and model name (from your GGUF filename) in Settings.',
-			},
-		],
-	},
-]
+import { type Provider, type ProviderStep, providers } from './providers'
 
 function TerminalBlock({ command }: { command: string }) {
 	return (
-		<code className="block bg-[#1a1a2e] text-green-400 px-4 py-3 rounded-lg font-mono text-sm overflow-x-auto">
+		<code className="block bg-[#1a1a2e] text-green-400 px-4 py-3 rounded-lg font-mono text-sm break-all">
 			{command}
 		</code>
 	)
 }
 
-function StepItem({ step, isLast, platform }: { step: ProviderStep; isLast: boolean; platform: Platform }) {
+function StepItem({
+	step,
+	isLast,
+	platform,
+	index,
+}: {
+	step: ProviderStep
+	isLast: boolean
+	platform: Platform
+	index: number
+}) {
 	// Skip steps that don't apply to current platform
 	if (step.platforms && !step.platforms.includes(platform)) {
 		return null
 	}
 
+	// Reserved per index, so a provider with a taller step 1 cannot push step 2
+	// down even though the column as a whole is pinned.
+	const reserved = `var(--demo-step-${index}-h)`
+
 	return (
-		<div className="flex gap-4">
+		<div data-part={`step-${index}`} style={{ minHeight: reserved }} className="flex gap-4">
 			<div className="flex flex-col items-center">
 				<div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-semibold">
 					{step.title.charAt(0)}
@@ -153,6 +49,74 @@ function StepItem({ step, isLast, platform }: { step: ProviderStep; isLast: bool
 	)
 }
 
+// The provider-dependent block. Step count and the Quick Reference card both vary
+// by provider, and the platform filter changes the count again on first paint.
+function ProviderBody({ provider, platform }: { provider: Provider; platform: Platform }) {
+	const steps = provider.steps.filter((step) => !step.platforms || step.platforms.includes(platform))
+
+	return (
+		<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+			{/* grid-cols-1 is not redundant: it is repeat(1, minmax(0, 1fr)), and the 0
+			    minimum is what stops a long URL in Quick Reference from sizing the
+			    track to max-content and pushing the page into a sideways scroll. */}
+			<div className="min-w-0">
+				<div data-part="provider-head" className="flex items-center gap-3 mb-6">
+					<h3 className="text-xl font-semibold min-w-0 break-words">{provider.name}</h3>
+					<span className="ml-auto shrink-0 text-center text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+						Port {provider.defaultPort}
+					</span>
+				</div>
+
+				<div>
+					{steps.map((step, index) => (
+						<StepItem
+							key={step.title}
+							step={step}
+							isLast={index === steps.length - 1}
+							platform={platform}
+							index={index}
+						/>
+					))}
+				</div>
+			</div>
+
+			<div
+				data-part="quickref"
+				style={{ minHeight: 'var(--demo-quickref-h)' }}
+				className="bg-card rounded-xl p-6 border border-border h-fit"
+			>
+				<h4 className="font-semibold mb-4">Quick Reference</h4>
+
+				<div className="space-y-4">
+					<div>
+						<p className="text-xs text-muted-foreground mb-1">API URL</p>
+						<TerminalBlock command={provider.defaultApiUrl} />
+					</div>
+
+					<div className="border-t border-border pt-4">
+						<p className="text-xs text-muted-foreground mb-2">Install</p>
+						<a
+							href={provider.installUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-sm text-primary hover:underline break-all"
+						>
+							{provider.installUrl}
+						</a>
+					</div>
+				</div>
+
+				<div className="mt-6 p-4 bg-secondary/50 rounded-lg">
+					<p className="text-sm">
+						<strong>Note:</strong> Any OpenAI-compatible API works. The app sends text to your local server
+						and receives translations back.
+					</p>
+				</div>
+			</div>
+		</div>
+	)
+}
+
 interface SetupGuideProps {
 	selectedPlatform: Platform | null
 }
@@ -162,10 +126,12 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 	const detectedPlatform = usePlatform()
 	const platform = selectedPlatform ?? detectedPlatform
 	const activeProvider = providers.find((p) => p.id === activeTab)!
-	const visibleSteps = activeProvider.steps.filter((step) => !step.platforms || step.platforms.includes(platform))
+	// The platform decides how many steps each provider lists, so it is part of
+	// what gets measured.
+	const height = useStableHeight<HTMLDivElement>([platform])
 
 	return (
-		<section className="py-20 px-6 border-t border-border">
+		<section className="section-gutter py-20 border-t border-border">
 			<div className="max-w-4xl mx-auto">
 				<h2 className="text-3xl font-bold text-center mb-4">Setup Your AI Backend</h2>
 				<p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -191,58 +157,15 @@ export default function SetupGuide({ selectedPlatform }: SetupGuideProps) {
 				</div>
 
 				{/* Tab Content */}
-				<div className="grid md:grid-cols-2 gap-8">
-					{/* Left: Steps */}
-					<div>
-						<div className="flex items-center gap-3 mb-6">
-							<h3 className="text-xl font-semibold">{activeProvider.name}</h3>
-							<span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
-								Port {activeProvider.defaultPort}
-							</span>
-						</div>
-
-						<div>
-							{visibleSteps.map((step, index) => (
-								<StepItem
-									key={step.title}
-									step={step}
-									isLast={index === visibleSteps.length - 1}
-									platform={platform}
-								/>
+				<div ref={height.containerRef} className="relative" style={height.style}>
+					{height.measuring && (
+						<height.MeasurePass setRef={height.setMeasureRef}>
+							{providers.map((provider) => (
+								<ProviderBody key={provider.id} provider={provider} platform={platform} />
 							))}
-						</div>
-					</div>
-
-					{/* Right: Quick Reference */}
-					<div className="bg-card rounded-xl p-6 border border-border h-fit">
-						<h4 className="font-semibold mb-4">Quick Reference</h4>
-
-						<div className="space-y-4">
-							<div>
-								<p className="text-xs text-muted-foreground mb-1">API URL</p>
-								<TerminalBlock command={activeProvider.defaultApiUrl} />
-							</div>
-
-							<div className="border-t border-border pt-4">
-								<p className="text-xs text-muted-foreground mb-2">Install</p>
-								<a
-									href={activeProvider.installUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-sm text-primary hover:underline"
-								>
-									{activeProvider.installUrl}
-								</a>
-							</div>
-						</div>
-
-						<div className="mt-6 p-4 bg-secondary/50 rounded-lg">
-							<p className="text-sm">
-								<strong>Note:</strong> Any OpenAI-compatible API works. The app sends text to your local
-								server and receives translations back.
-							</p>
-						</div>
-					</div>
+						</height.MeasurePass>
+					)}
+					<ProviderBody provider={activeProvider} platform={platform} />
 				</div>
 
 				{/* System Requirements Footer */}

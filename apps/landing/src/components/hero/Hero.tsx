@@ -1,9 +1,10 @@
 import { Download, Info } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Platform, usePlatform } from '../../hooks/usePlatform'
+import { useStableHeight } from '../../hooks/useStableHeight'
 import { REPO_URL, releasesUrl } from '../../lib/site'
 import { GitHubIcon } from '../Icons'
-import { DEMO_EXAMPLES } from './examples'
+import { DEMO_EXAMPLES, type DemoExample } from './examples'
 import LocaleDemo from './LocaleDemo'
 
 type PlatformKey = 'macos' | 'windows' | 'linux'
@@ -25,9 +26,44 @@ const platformDownloadUrls: Record<PlatformKey, string> = {
 	linux: releasesUrl,
 }
 
+/**
+ * The caption and the demo card, measured as one unit so that neither a caption
+ * wrapping to a second line nor a taller card moves the rest of the page.
+ */
+function DemoColumn({ example }: { example: DemoExample }) {
+	return (
+		<div>
+			<p
+				data-part="caption"
+				className="text-xs text-muted-foreground mt-2"
+				style={{ minHeight: 'var(--demo-caption-h)' }}
+			>
+				{example.useCase}
+			</p>
+
+			<div
+				role="tabpanel"
+				id={`demo-panel-${example.id}`}
+				aria-labelledby={`demo-tab-${example.id}`}
+				className="mt-3"
+			>
+				<LocaleDemo example={example} />
+			</div>
+
+			<p className="text-xs text-muted-foreground mt-3">
+				AI translations can contain errors. Review every change in the diff view and approve it before relying
+				on the output.
+			</p>
+		</div>
+	)
+}
+
 function DemoTabs() {
 	const [activeIndex, setActiveIndex] = useState(0)
 	const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+	// Every example is static and all of them are measured on every pass, so nothing
+	// about the active one changes the reservation.
+	const height = useStableHeight<HTMLDivElement>()
 
 	const focusTab = (index: number) => {
 		const bounded = (index + DEMO_EXAMPLES.length) % DEMO_EXAMPLES.length
@@ -80,21 +116,16 @@ function DemoTabs() {
 				))}
 			</div>
 
-			<p className="text-xs text-muted-foreground mt-2">{active.useCase}</p>
-
-			<div
-				role="tabpanel"
-				id={`demo-panel-${active.id}`}
-				aria-labelledby={`demo-tab-${active.id}`}
-				className="mt-3"
-			>
-				<LocaleDemo example={active} />
+			<div ref={height.containerRef} className="relative" style={height.style}>
+				{height.measuring && (
+					<height.MeasurePass setRef={height.setMeasureRef}>
+						{DEMO_EXAMPLES.map((example) => (
+							<DemoColumn key={example.id} example={example} />
+						))}
+					</height.MeasurePass>
+				)}
+				<DemoColumn example={active} />
 			</div>
-
-			<p className="text-xs text-muted-foreground mt-3">
-				AI translations can contain errors. Review every change in the diff view and approve it before relying
-				on the output.
-			</p>
 		</div>
 	)
 }
@@ -106,7 +137,7 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 	const isSupported = platform !== 'unsupported'
 
 	return (
-		<section className="min-h-[calc(100vh-80px)] flex items-center px-6 md:px-12 py-16 relative overflow-hidden">
+		<section className="section-gutter min-h-[calc(100vh-80px)] flex items-center py-16 relative overflow-hidden">
 			{/* Background gradient */}
 			<div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5" />
 			<div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-slow" />

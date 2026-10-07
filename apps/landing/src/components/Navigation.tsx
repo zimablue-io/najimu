@@ -35,7 +35,9 @@ export default function Navigation() {
 						<button
 							key={item.id}
 							onClick={() => scrollToSection(item.id)}
-							className="group relative flex items-center h-10 rounded-full overflow-hidden transition-all duration-300 shadow-md border border-border bg-card w-10 hover:w-auto"
+							// The hover expansion is capped at the gutter the sections reserve,
+							// so an expanded pill can never reach into the content.
+							className="group relative flex items-center h-10 rounded-full overflow-hidden transition-all duration-300 shadow-md border border-border bg-card w-10 hover:w-[7.5rem]"
 							title={item.label}
 						>
 							<div className="flex-shrink-0 pl-[10px]">

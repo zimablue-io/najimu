@@ -14,6 +14,27 @@
 	--accent: #2d2d44;
 	--accent-foreground: #e0e0e0;
 	--border: #2d2d44;
+
+	/* Left gutter reserved for the fixed sidebar, which sits outside the flow.
+	   The sidebar's own left offset is 1rem, and its expanded pill is 7.5rem wide,
+	   so its right edge lands at 8.5rem. This gutter clears that edge plus a gap.
+	   Measured, an expanded pill spans x=16..136, so 8.5rem alone would leave the
+	   content flush against it. Below md the sidebar is hidden and this is never
+	   applied. */
+	--nav-gutter: 10rem;
+	--section-gutter: 1.5rem;
+}
+
+/* Horizontal padding for every full-width band. The left edge widens at md to
+   clear the fixed sidebar; the right edge stays put so the text column is the
+   same width at every viewport. Declared here rather than on each <section> so
+   one edit moves them all. */
+@utility section-gutter {
+	padding-inline: var(--section-gutter);
+
+	@media (width >= 48rem) {
+		padding-inline-start: var(--nav-gutter);
+	}
 }
 
 html,
@@ -57,19 +78,16 @@ body {
 	50% { transform: translateY(-12px); }
 }
 
+/* Opacity only. Animating transform here moves the blob's visual rect every frame,
+   which Chrome reports as a continuous stream of layout shift entries. */
 @keyframes pulse-slow {
-	0%, 100% { opacity: 0.5; transform: scale(1); }
-	50% { opacity: 0.8; transform: scale(1.05); }
+	0%, 100% { opacity: 0.5; }
+	50% { opacity: 0.85; }
 }
 
 @keyframes glow {
 	0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
 	50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.5); }
-}
-
-@keyframes word-change {
-	0% { opacity: 0; transform: translateY(5px); }
-	100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes bounce-slow {
@@ -99,11 +117,6 @@ body {
 
 .animate-glow {
 	animation: glow 3s ease-in-out infinite;
-}
-
-.animate-word-change {
-	animation: word-change 0.3s ease-out forwards;
-	opacity: 0;
 }
 
 .animate-bounce-slow {

@@ -36,7 +36,7 @@ const features = [
 
 export default function Features() {
 	return (
-		<section className="py-12 md:py-16 px-6 border-t border-border bg-gradient-to-b from-card/50 to-background">
+		<section className="section-gutter py-12 md:py-16 border-t border-border bg-gradient-to-b from-card/50 to-background">
 			<div className="max-w-6xl mx-auto w-full">
 				<div className="text-center mb-8">
 					<h2 className="text-2xl font-bold mb-1">Everything you need for offline document translation</h2>
