@@ -4,9 +4,13 @@ This document explains how releases work for Najimu.
 
 ## Overview
 
-We use **release-please** to automate version bumps and changelog generation based on conventional commits. The release process involves two GitHub Actions workflows:
+Najimu has a single release unit: the desktop app. release-please bumps
+`apps/desktop/package.json`, writes `apps/desktop/CHANGELOG.md`, and tags
+`v<version>`. The workspace root is not versioned.
 
-1. **Release Please** (`.github/workflows/release-please.yml`) - Creates release PRs and publishes releases
+Two GitHub Actions workflows are involved:
+
+1. **Release Please** (`.github/workflows/release-please.yml`) - Opens a release PR, then publishes the release
 2. **Build Release** (`.github/workflows/build-on-release.yml`) - Builds and uploads platform binaries
 
 ## Why Release-Please Creates PRs
@@ -24,7 +28,7 @@ Release-please is designed to create a **pull request** for each release rather 
 2. Release Please workflow triggers on push to main
 3. Release Please creates a PR titled "chore(main): release X.Y.Z"
 4. PR is reviewed and merged to main
-5. Release Please publishes the release (creates tag + GitHub release)
+5. Release Please publishes the release (creates the `v<version>` tag and GitHub release)
 6. Release Please triggers Build Release via workflow_dispatch
 7. Build Release builds for macOS, Windows, and Linux
 8. Build Release uploads binaries to the release
@@ -50,7 +54,8 @@ If a build fails or you need to rebuild:
 
 ## Version Bumping
 
-The version is determined automatically by release-please based on commit messages:
+The version is determined by release-please from the commit messages since the
+last `v<version>` tag:
 
 | Commit Type | Example | Version Change |
 |-------------|---------|---------------|

@@ -39,14 +39,8 @@ jobs:
         shell: bash
         run: |
           TAG_NAME="${GITHUB_REF/refs\/tags\//}"
-          echo "Tag name is: $TAG_NAME"
-          if [[ "$TAG_NAME" == desktop-* ]]; then
-            VERSION="${TAG_NAME#desktop-}"
-            VERSION="${VERSION#v}"
-          else
-            VERSION="${TAG_NAME#v}"
-          fi
-          echo "Syncing version $VERSION to apps/desktop/package.json"
+          VERSION="${TAG_NAME#v}"
+          echo "Tag name is: $TAG_NAME (version $VERSION)"
           node -e "
             const fs = require('fs');
             const pkg = JSON.parse(fs.readFileSync('apps/desktop/package.json', 'utf8'));
