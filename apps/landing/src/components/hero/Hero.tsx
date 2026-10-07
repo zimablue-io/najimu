@@ -1,6 +1,9 @@
-import { Download, FileText, Info } from 'lucide-react'
-import { Platform, usePlatform } from '../hooks/usePlatform'
-import { GitHubIcon } from './Icons'
+import { Download, Info } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Platform, usePlatform } from '../../hooks/usePlatform'
+import { GitHubIcon } from '../Icons'
+import { DEMO_EXAMPLES } from './examples'
+import LocaleDemo from './LocaleDemo'
 
 type PlatformKey = 'macos' | 'windows' | 'linux'
 
@@ -21,41 +24,76 @@ const platformDownloadUrls: Record<PlatformKey, string> = {
 	linux: 'https://github.com/zimablue-io/document-localizer/releases/latest',
 }
 
-const originalText = 'The color of the car is parked in the garage. Mom made her favorite soccer jersey.'
-const localizedText = 'The colour of the car is parked in the garage. Mum made her favourite football jersey.'
+function DemoTabs() {
+	const [activeIndex, setActiveIndex] = useState(0)
+	const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
-const changedOriginal = ['color', 'Mom', 'favorite', 'soccer']
-const changedLocalized = ['colour', 'Mum', 'favourite', 'football']
+	const focusTab = (index: number) => {
+		const bounded = (index + DEMO_EXAMPLES.length) % DEMO_EXAMPLES.length
+		setActiveIndex(bounded)
+		tabRefs.current[bounded]?.focus()
+	}
 
-function OriginalText() {
+	const onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+		if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+			event.preventDefault()
+			focusTab(index + 1)
+		} else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+			event.preventDefault()
+			focusTab(index - 1)
+		} else if (event.key === 'Home') {
+			event.preventDefault()
+			focusTab(0)
+		} else if (event.key === 'End') {
+			event.preventDefault()
+			focusTab(DEMO_EXAMPLES.length - 1)
+		}
+	}
+
+	const active = DEMO_EXAMPLES[activeIndex]
+
 	return (
-		<div className="font-mono text-sm leading-relaxed">
-			{originalText.split(' ').map((word, i) => (
-				<span
-					key={i}
-					className={`${changedOriginal.includes(word) ? 'bg-red-900/50 text-red-300 px-0.5 rounded mx-[-1px]' : ''}`}
-				>
-					{word}{' '}
-				</span>
-			))}
-		</div>
-	)
-}
-
-function LocalizedText() {
-	return (
-		<div className="font-mono text-sm leading-relaxed">
-			{localizedText.split(' ').map((word, i) => {
-				const isChanged = changedLocalized.includes(word)
-				return (
-					<span
-						key={i}
-						className={`${isChanged ? 'bg-green-900/50 text-green-300 px-0.5 rounded mx-[-1px]' : ''}`}
+		<div>
+			<div role="tablist" aria-label="Localization examples" className="flex border-b border-border">
+				{DEMO_EXAMPLES.map((example, index) => (
+					<button
+						key={example.id}
+						ref={(el) => {
+							tabRefs.current[index] = el
+						}}
+						role="tab"
+						id={`demo-tab-${example.id}`}
+						aria-controls={`demo-panel-${example.id}`}
+						aria-selected={index === activeIndex}
+						tabIndex={index === activeIndex ? 0 : -1}
+						onClick={() => setActiveIndex(index)}
+						onKeyDown={(e) => onKeyDown(e, index)}
+						className={`px-3 py-2 text-xs md:text-sm font-medium border-b-2 transition-colors ${
+							index === activeIndex
+								? 'border-primary text-primary'
+								: 'border-transparent text-muted-foreground hover:text-foreground'
+						}`}
 					>
-						{word}{' '}
-					</span>
-				)
-			})}
+						{example.label}
+					</button>
+				))}
+			</div>
+
+			<p className="text-xs text-muted-foreground mt-2">{active.useCase}</p>
+
+			<div
+				role="tabpanel"
+				id={`demo-panel-${active.id}`}
+				aria-labelledby={`demo-tab-${active.id}`}
+				className="mt-3"
+			>
+				<LocaleDemo example={active} />
+			</div>
+
+			<p className="text-xs text-muted-foreground mt-3">
+				AI translations can contain errors. Review every change in the diff view and approve it before relying
+				on the output.
+			</p>
 		</div>
 	)
 }
@@ -174,64 +212,7 @@ export default function Hero({ selectedPlatform, onPlatformChange }: HeroProps) 
 
 				{/* Right: Animated Demo */}
 				<div className="relative">
-					{/* Floating document icons */}
-					<div className="absolute -top-8 -left-8 animate-float-delayed hidden md:block">
-						<div className="w-16 h-20 bg-card rounded-lg border border-border shadow-lg flex items-center justify-center">
-							<FileText className="w-8 h-8 text-primary" />
-						</div>
-					</div>
-					<div className="absolute -top-4 right-4 animate-float hidden md:block">
-						<div className="w-14 h-18 bg-card rounded-lg border border-border shadow-lg flex items-center justify-center">
-							<FileText className="w-7 h-7 text-purple-400" />
-						</div>
-					</div>
-					<div className="absolute bottom-0 -left-12 animate-float-delayed-2 hidden md:block">
-						<div className="w-12 h-16 bg-card rounded-lg border border-border shadow-lg flex items-center justify-center">
-							<FileText className="w-6 h-6 text-green-400" />
-						</div>
-					</div>
-
-					{/* Vertical diff boxes */}
-					<div className="bg-card/80 backdrop-blur rounded-2xl border border-border p-4 md:p-6 shadow-2xl">
-						<div className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-							<span className="w-2 h-2 rounded-full bg-red-400" />
-							Original (American English)
-						</div>
-						<div className="bg-[#1a1a2e] rounded-lg p-3 md:p-4 mb-3 md:mb-4">
-							<OriginalText />
-						</div>
-
-						<div className="flex justify-center my-3">
-							<div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center animate-bounce-slow gap-0">
-								<svg
-									className="w-5 h-5 text-primary"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<path d="M12 5v14M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-								</svg>
-								<svg
-									className="w-5 h-5 text-primary"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-								>
-									<path d="M12 19V5M5 12l7 7 7-7" strokeLinecap="round" strokeLinejoin="round" />
-								</svg>
-							</div>
-						</div>
-
-						<div className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-							<span className="w-2 h-2 rounded-full bg-green-400" />
-							Localized (British English)
-						</div>
-						<div className="bg-[#1a1a2e] rounded-lg p-3 md:p-4">
-							<LocalizedText />
-						</div>
-					</div>
+					<DemoTabs />
 				</div>
 			</div>
 		</section>

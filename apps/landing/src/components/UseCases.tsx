@@ -1,25 +1,25 @@
-import { Briefcase, Code, BookOpen, Shield, FileText, Zap } from 'lucide-react'
+import { BookOpen, Briefcase, Code, FileText, Shield, Zap } from 'lucide-react'
 
 const useCases = [
 	{
 		icon: Shield,
 		title: 'Legal & Compliance',
 		description:
-			'Localize contracts, NDAs, and regulatory filings without ever sending sensitive client data to third-party cloud servers. Keep your entire workflow on-premise.',
+			'Draft contracts, NDAs, and regulatory filings without sending sensitive client data to third-party cloud servers. Output is machine-generated and needs qualified review before it is relied on.',
 		color: 'text-blue-500',
 	},
 	{
 		icon: Code,
 		title: 'Technical Documentation',
 		description:
-			'Translate API docs, developer guides, and READMEs while preserving markdown formatting, code blocks, and syntax highlighting. No broken code snippets.',
+			'Translate API docs, developer guides, and READMEs as a first pass for a human reviewer. Markdown structure carries through on Markdown export; code blocks are dropped on PDF export.',
 		color: 'text-emerald-500',
 	},
 	{
 		icon: BookOpen,
 		title: 'Publishing & Books',
 		description:
-			'Pre-translate manuscripts and manuscripts for human editors, cutting traditional translation costs by up to 70%. Human reviewers only need to edit, not rewrite.',
+			'Pre-translate manuscripts so human editors start from a draft instead of a blank page. A reviewer still checks every passage before publication.',
 		color: 'text-purple-500',
 	},
 	{
@@ -52,7 +52,9 @@ export default function UseCases() {
 				<div className="text-center mb-16">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the Use Cases That Matter</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						Whether you're translating sensitive legal documents, developer manuals, or full book manuscripts — Document Localizer keeps your data local and your output professional.
+						Whether you're translating sensitive legal documents, developer manuals, or full book
+						manuscripts — Document Localizer keeps your data local and gives you a reviewable draft to start
+						from.
 					</p>
 				</div>
 

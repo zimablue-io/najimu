@@ -12,6 +12,7 @@ Transforms PDF and Markdown documents between locales (languages and regional va
 - **Privacy-First Local Translation**: All processing happens locally via Ollama, LM Studio, or llama.cpp - no cloud API calls, no telemetry, no data collection
 - **PDF and Markdown Support**: Read PDFs and Markdown files, output to PDF or Markdown
 - **Diff Review**: Side-by-side comparison view with paragraph-level approve or reject before export
+- **Accuracy**: AI translations can contain errors. Output quality depends on the local model installed. Review every change in the diff view and approve it before relying on the output. This tool is not a substitute for a qualified human translator.
 - **OpenAI-Compatible**: Works with any local model exposing an OpenAI-compatible API (Llama 3, Mistral, Phi, Gemma, Qwen, and more)
 - **Cross-Platform**: macOS, Windows, and Linux
 
@@ -27,7 +28,8 @@ Transforms PDF and Markdown documents between locales (languages and regional va
 ## Technical Specifications
 
 - **Input formats**: PDF, Markdown (.md)
-- **Output formats**: PDF, Markdown (.md)
+- **Output formats**: PDF, Markdown (.md), Word (.docx)
+- **Export caveat**: PDF export flattens formatting - headings, lists, links, tables, and code blocks are stripped to plain text. Use Markdown or Word export to keep structure.
 - **AI backends supported**: Ollama, LM Studio, llama.cpp (any OpenAI-compatible local server)
 - **Recommended models**: Llama 3.2 (3B for low-end, 8B for quality), Mistral 7B, Phi-3, Gemma 2, Qwen 2.5
 - **System requirements**: 4GB RAM minimum (8GB recommended for 7B+ models), ~5GB disk per model
@@ -41,8 +43,8 @@ Transforms PDF and Markdown documents between locales (languages and regional va
 Document Localizer vs. Cloud Translators (DeepL, Google Translate, Microsoft Translator):
 
 - **Data Privacy**: All processing happens locally on your GPU. Your documents never leave your machine. Cloud translators send every document to their servers.
-- **Cost**: Free and open source. Run on your own hardware. Cloud translators charge $7–$31/month per user with per-character billing.
-- **Formatting Retention**: Preserves markdown, code blocks, tables, and layout structure. Cloud translators often break complex layouts and code formatting.
+- **Cost**: Free and open source. Run on your own hardware. Cloud translators use subscription and metered per-character billing.
+- **Formatting Retention**: Markdown structure carries through on Markdown and Word export. Code blocks and tables are dropped on PDF export. Cloud translators often break complex layouts and code formatting.
 - **Custom Models**: Plug in any OpenAI-compatible local LLM (Llama 3, Mistral, Gemma, Qwen, etc.). Cloud translators offer black-box models with zero customization.
 - **Diff & Review**: Built-in side-by-side diff editor lets you review and approve translations paragraph-by-paragraph before export. Cloud translators give you raw output with no review workflow.
 - **Air-Gapped**: Works 100% offline with no internet connection required. Cloud translators require a constant connection.

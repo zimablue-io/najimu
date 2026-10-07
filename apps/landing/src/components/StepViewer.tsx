@@ -33,7 +33,7 @@ const steps: Step[] = [
 
 export default function StepViewer() {
 	const [activeStep, setActiveStep] = useState(0)
-	const stepRefs = useRef<(HTMLDivElement | null)[]>([])
+	const stepRefs = useRef<(Element | null)[]>([])
 
 	// Scroll-driven activation via IntersectionObserver (desktop only)
 	useEffect(() => {

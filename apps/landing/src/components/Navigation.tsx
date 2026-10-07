@@ -1,4 +1,4 @@
-import { LayoutGrid, ListChecks, Menu, Server, X, Briefcase, Swords } from 'lucide-react'
+import { Briefcase, LayoutGrid, ListChecks, Menu, Server, Swords, X } from 'lucide-react'
 import { useState } from 'react'
 import { useActiveSection } from '../hooks/useActiveSection'
 

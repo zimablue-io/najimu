@@ -1,4 +1,4 @@
-import { Check, X, Shield, Zap, DollarSign, FileText, Lock, Globe, Cloud } from 'lucide-react'
+import { DollarSign, FileText, Lock, Shield, Zap } from 'lucide-react'
 
 const features = [
 	{
@@ -21,7 +21,7 @@ const features = [
 	},
 	{
 		label: 'Formatting Retention',
-		localizer: 'Preserves markdown, code blocks, and layout structure',
+		localizer: 'Markdown structure carries through on Markdown and Word export',
 		deepl: 'Basic formatting — complex layouts often break',
 		google: 'Basic formatting — tables and code can degrade',
 		localizerIcon: FileText,
@@ -64,7 +64,8 @@ export default function VsCompetitors() {
 				<div className="text-center mb-16">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">Document Localizer vs. Cloud Translators</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						DeepL and Google Translate are fast for quick sentences — but when your documents are sensitive, expensive, or complex, local processing wins.
+						DeepL and Google Translate are fast for quick sentences — but when your documents are sensitive,
+						expensive, or complex, local processing wins.
 					</p>
 				</div>
 
@@ -73,9 +74,7 @@ export default function VsCompetitors() {
 						<thead>
 							<tr className="border-b-2 border-border">
 								<th className="pb-4 pr-8 text-sm font-medium text-muted-foreground w-1/3">Feature</th>
-								<th className="pb-4 px-8 text-lg font-bold text-primary">
-									Document Localizer
-								</th>
+								<th className="pb-4 px-8 text-lg font-bold text-primary">Document Localizer</th>
 								<th className="pb-4 px-4 text-lg font-semibold text-foreground">DeepL</th>
 								<th className="pb-4 px-4 text-lg font-semibold text-foreground">Google Translate</th>
 							</tr>
@@ -86,18 +85,14 @@ export default function VsCompetitors() {
 								return (
 									<tr
 										key={feat.label}
-										className={
-											i === features.length - 1 ? '' : 'border-b border-border/50'
-										}
+										className={i === features.length - 1 ? '' : 'border-b border-border/50'}
 									>
 										<td className="py-5 pr-8 align-top">
 											<div className="flex items-center gap-2 mb-1">
 												<Icon className={`w-4 h-4 ${feat.localizerColor}`} />
 												<span className="font-medium">{feat.label}</span>
 											</div>
-											<p className="text-xs text-muted-foreground">
-												{feat.localizer}
-											</p>
+											<p className="text-xs text-muted-foreground">{feat.localizer}</p>
 										</td>
 										<td className="py-5 px-8 align-top">
 											<p className="font-medium text-emerald-600 dark:text-emerald-400 mb-2">

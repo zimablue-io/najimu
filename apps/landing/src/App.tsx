@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Features from './components/Features'
 import Footer from './components/Footer'
-import Hero from './components/Hero'
+import Hero from './components/hero/Hero'
 import Navigation from './components/Navigation'
 import SetupGuide from './components/SetupGuide'
 import StepViewer from './components/StepViewer'
