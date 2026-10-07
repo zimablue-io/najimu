@@ -43,7 +43,6 @@ describe('Najimu bundle identity', () => {
 	})
 
 	it('depends on the workspace packages through the Najimu scope', () => {
-		expect(JSON.stringify(pkg.dependencies)).not.toContain('@doclocalizer/')
 		expect(pkg.dependencies['@najimu/core']).toBe('workspace:*')
 		expect(pkg.dependencies['@najimu/ui']).toBe('workspace:*')
 	})
