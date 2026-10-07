@@ -142,6 +142,20 @@ pnpm build:desktop                   # Production build
 pnpm electron:build                  # electron-builder (creates .dmg)
 ```
 
+### When Electron won't start
+
+`"Electron failed to install correctly"` means `path.txt` is missing next to
+`install.js`, so `index.js` cannot resolve the binary. `electron --version` still
+works in that state, so the install looks healthy until launch. Re-run the
+install script in the resolved package:
+
+```bash
+node node_modules/.pnpm/electron@<version>/node_modules/electron/install.js
+```
+
+`pnpm-workspace.yaml` sets `allowBuilds.electron`; if that allowlist change is
+lost, the postinstall never runs and this is the symptom.
+
 ## Tests
 
 ```bash

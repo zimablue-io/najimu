@@ -9,6 +9,9 @@
 
 ## Task Routing
 
+Read the guide for the tree you are editing before changing anything. The
+closest one wins.
+
 | What You Need | Go Here |
 |---------------|---------|
 | Dev setup | `docs/CONTRIBUTING.md` |
@@ -22,32 +25,15 @@
 | Security policy | `docs/SECURITY.md` |
 | Release process | `docs/RELEASES.md` |
 
-## Code Locations
-
-```
-apps/desktop/src/
-├── App.tsx              # Main orchestrator
-├── components/          # UI (Header, DocumentList, DiffView, SettingsModal...)
-├── lib/                 # Business logic (locales.ts, prompts.ts, processing.ts...)
-├── hooks/               # React hooks (useDocuments.ts)
-└── types/               # TypeScript interfaces
-
-apps/desktop/electron/
-├── main.ts              # Electron main process, IPC handlers
-├── preload.ts           # Context bridge
-└── embedder/            # EmbeddingGemma 2 worker thread (translation memory)
-
-packages/core/src/
-└── services/            # openai-client, file-processor, pdf, localize, process-document
-```
-
 ## Key Constraints
+
+These apply everywhere. Package-specific constraints live in the nested guides.
 
 1. **Run tests before finishing**: `pnpm test`
 2. **Use Biome for formatting**: `pnpm lint:fix`
-3. **Settings stored in JSON files** - no database, no conf library
-4. **All file ops go through IPC** - renderer has no direct fs access
-5. **Test-first for bugs/features**: When fixing bugs or implementing features, write tests that FAIL before the fix, then PASS after. This prevents regressions and proves the fix works. Never claim "done" without tests verifying the behavior.
+3. **Test-first for bugs/features**: When fixing bugs or implementing features, write tests that FAIL before the fix, then PASS after. This prevents regressions and proves the fix works. Never claim "done" without tests verifying the behavior.
+4. **Vitest green is not TypeScript green.** `tsc --noEmit` is a separate check; `apps/landing` needs its own run.
+5. **No hardcoded hosts in the landing app.** Site and repo URLs come from `apps/landing/.env.example`.
 
 ## Standard Commands
 
@@ -59,45 +45,40 @@ pnpm build:desktop        # Build desktop app
 pnpm build:landing        # Build landing page
 pnpm test                 # Run all tests
 pnpm lint:fix             # Format and lint
+pnpm knip                 # Find dead code and unused exports
 ```
 
 ## Architecture Summary
 
 **Desktop App**: Three-tab system (Uploaded → Tasks → Processed)
-- User uploads PDF/.md files
-- Selects locales, clicks Process
+- User uploads PDF/.md files and selects locales
 - Approved translations are retrieved from translation memory as terminology examples
-- AI localizes paragraphs via local LLM
-- User reviews in diff view, approves/rejects
+- AI localizes paragraphs via a local LLM
+- User reviews in a diff view and approves or rejects
 - Approving records the translation into memory
-- Exports approved as Markdown or PDF
+- Exports approved output as Markdown or PDF
 
 **Translation Memory**: EmbeddingGemma 2 runs in-process in a worker thread
 - No embedding server, no configuration, no extra model for the user to start
 - Model weights download once and cache under Electron `userData/models`
 - If embeddings fail, translation continues without memory
 
-**Landing Page**: Marketing site at najimu.zimablue.io
-- Hero with animated demo
-- Features, How It Works, Setup Guide sections
-
-## Modifying the Locale List
-
-The **single source of truth** for locales is `apps/desktop/src/lib/locales.ts`.
-The `ALL_LOCALES` array is exported from there - do NOT duplicate.
+**Landing Page**: Static marketing site at najimu.zimablue.io. No backend.
 
 ## Version Bumping
 
-The GitHub Actions workflow handles version bumping automatically on push to main.
-Do not manually bump versions. See `docs/RELEASES.md` for full release process details.
+The GitHub Actions workflow handles version bumping automatically on push to
+main. Do not manually bump versions. See `docs/RELEASES.md` for the full
+process.
 
 ## Getting Unstuck
 
 - For code questions: read the nearby files, follow existing patterns
-- For architecture: see `AGENTS.md` architecture section
+- For architecture: see the nested `AGENTS.md` for that tree
 - For patterns: check `biome.json` for formatting rules
+- For install or build failures, see the matching nested guide
 
 ## Agent Notes
 
-Project-specific facts for coding agents live in `.agents/memories.md`.
-Cross-project preferences and rules live in `~/.agents`.
+Facts that should hold for everyone belong here or in a nested `AGENTS.md`.
+Anything that can be enforced should be a test or a linter rule, not prose.
