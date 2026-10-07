@@ -107,7 +107,7 @@ pnpm build:landing              # Production build
 
 1. **Static site only** - No API calls, no server
 2. **Build copies public/** to dist/
-3. **Vercel Analytics** - Only on landing page, not desktop app
+3. **Vercel Analytics and Speed Insights** - Only on landing page, not desktop app
 4. **Marketing copy is tested** - `tests/marketing-claims.test.ts` asserts every
    capability claim against the code that implements it. Do not add a claim the
    implementation cannot back.
