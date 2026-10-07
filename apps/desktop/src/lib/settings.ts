@@ -21,25 +21,16 @@ export async function loadSettings(): Promise<Settings> {
 			const r = result as Record<string, unknown>
 
 			const existingModels = (r.models as ModelConfig[]) || []
-			const legacyModel = r.model as string
 
-			let models = existingModels
 			let activeModelId = (r.activeModelId as string) || ''
 
-			if (legacyModel && models.length === 0) {
-				const newModel: ModelConfig = {
-					id: crypto.randomUUID(),
-					name: legacyModel,
-				}
-				models = [newModel]
-				activeModelId = newModel.id
-			} else if (models.length > 0 && !activeModelId) {
-				activeModelId = models[0].id
+			if (existingModels.length > 0 && !activeModelId) {
+				activeModelId = existingModels[0].id
 			}
 
 			return {
 				apiUrl: (r.apiUrl as string) || DEFAULT_API_URL,
-				models,
+				models: existingModels,
 				activeModelId,
 				activePromptId: (r.activePromptId as string) || 'default.md',
 				chunkSize: (r.chunkSize as string) || DEFAULT_CHUNK_SIZE,

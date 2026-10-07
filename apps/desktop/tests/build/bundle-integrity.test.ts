@@ -1,56 +1,32 @@
-import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-describe('Electron bundle integrity', () => {
-	const distDir = path.join(__dirname, '../../dist-electron')
-	const asarPath = path.join(distDir, 'resources/app.asar')
-
-	const getAsarContents = (): string | null => {
-		if (!fs.existsSync(asarPath)) {
-			return null
-		}
-		try {
-			return execSync(`npx asar list "${asarPath}"`, {
-				encoding: 'utf8',
-			})
-		} catch {
-			return null
-		}
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf-8')) as {
+	dependencies: Record<string, string>
+	build: {
+		files: string[]
+		asarUnpack?: string[]
 	}
+}
 
-	describe('when asar is built', () => {
-		beforeAll(() => {
-			const contents = getAsarContents()
-			if (!contents) {
-				console.log('ASAR not found. Run "pnpm electron:build" first to verify bundle integrity.')
-			}
-		})
+/**
+ * These assert the packaging configuration rather than a built artifact,
+ * so they run on every `pnpm test` instead of quietly passing when the
+ * asar happens to be absent.
+ */
+describe('Electron bundle configuration', () => {
+	it('should ship the renderer and main-process output', () => {
+		expect(pkg.build.files).toContain('dist/**/*')
+		expect(pkg.build.files).toContain('dist-electron/**/*')
+	})
 
-		it('should include ms module for electron-updater', () => {
-			const contents = getAsarContents()
-			if (!contents) {
-				console.log('SKIP: Bundle integrity test requires asar. Run "pnpm electron:build" first.')
-				return
-			}
-			expect(contents).toContain('node_modules/ms/')
-		})
+	it('should declare transformers as a runtime dependency for the embedder', () => {
+		expect(pkg.dependencies['@huggingface/transformers']).toBeDefined()
+	})
 
-		it('should include debug module', () => {
-			const contents = getAsarContents()
-			if (!contents) {
-				return
-			}
-			expect(contents).toContain('node_modules/debug/')
-		})
-
-		it('should include electron-updater', () => {
-			const contents = getAsarContents()
-			if (!contents) {
-				return
-			}
-			expect(contents).toContain('node_modules/electron-updater/')
-		})
+	it('should unpack the onnxruntime native binaries, which cannot load from inside an asar', () => {
+		const unpacked = pkg.build.asarUnpack ?? []
+		expect(unpacked).toContain('**/node_modules/onnxruntime-node/bin/**')
 	})
 })

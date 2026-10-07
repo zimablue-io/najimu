@@ -78,6 +78,21 @@ export interface ProcessingOutput {
 }
 
 /**
+ * An approved source/target pair plus its source-language embedding,
+ * used to reuse established terminology on later runs.
+ */
+export interface MemoryEntry {
+	id: string
+	documentId: string
+	sourceText: string
+	translation: string
+	sourceLocale: string
+	targetLocale: string
+	embedding: number[]
+	approvedAt: string
+}
+
+/**
  * Document processing status types.
  */
 export type DocumentStatus = ProcessingOutput['status']

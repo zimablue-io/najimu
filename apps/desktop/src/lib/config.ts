@@ -9,6 +9,13 @@ export const DEFAULT_OVERLAP_SIZE = '100'
 export const DEFAULT_ENABLED_LOCALES = ['en-US', 'en-GB']
 
 /**
+ * Translation memory. The embedder is built in and configured by the user
+ * nowhere: it runs in-process and downloads its weights on first use.
+ */
+export const MEMORY_SIMILARITY_THRESHOLD = 0.7
+export const MEMORY_MATCH_LIMIT = 3
+
+/**
  * Processing configuration.
  */
 export const PROCESSING_CONCURRENCY = 4

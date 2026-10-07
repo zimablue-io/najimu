@@ -2,10 +2,13 @@
  * Document processing logic - parallel processing, AI calls, and response cleanup.
  */
 import { convertPdfToMarkdown } from '@doclocalizer/core'
-import { DISK_WRITE_INTERVAL, PROCESSING_CONCURRENCY } from './config'
+import { DISK_WRITE_INTERVAL, MEMORY_MATCH_LIMIT, MEMORY_SIMILARITY_THRESHOLD, PROCESSING_CONCURRENCY } from './config'
+import { embedTexts } from './embeddings'
 import { getOutputFileName, getOutputPath, isPdfPath, readPdfFile, readTextFile } from './files'
+import { buildMemoryContext, buildMemoryEntries, findReusableTranslation, splitParagraphs } from './memory'
 import { buildPrompt, validatePromptTemplate } from './prompts'
-import type { ProcessingOutput, SourceDocument } from './types'
+import { findSimilar } from './similarity'
+import type { MemoryEntry, ProcessingOutput, SourceDocument } from './types'
 
 /**
  * Processing result returned by the document processor.
@@ -98,10 +101,11 @@ export function cleanResponse(content: string): string {
 	// Remove any leading commentary
 	const smartApostrophe = '\u2019'
 	const regularApostrophe = "'"
-	// Match "Here's", "Heres" (missing apostrophe), "Here is" (with space)
+	// Match "Here's", "Heres" (missing apostrophe), "Here is" (with space),
+	// and any trailing wording after "translation" (e.g. "...of the markdown:")
 	processed = processed
 		.replace(
-			new RegExp(`^Here[${smartApostrophe}${regularApostrophe}]?s?(?:\\s+is)? (?:the )?translation[.:].*`, 'i'),
+			new RegExp(`^Here[${smartApostrophe}${regularApostrophe}]?s?(?:\\s+is)? (?:the )?translation[.:]?.*`, 'i'),
 			''
 		)
 		.trim()
@@ -160,7 +164,7 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 	}
 
 	// Split markdown into paragraphs - one paragraph per API call
-	const paragraphs = markdown.split(/\n\n+/).filter((p) => p.trim())
+	const paragraphs = splitParagraphs(markdown)
 
 	onStatusChange('localizing', { current: 0, total: paragraphs.length })
 
@@ -174,6 +178,10 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 		text: '{text}', // Keep as placeholder to be replaced per paragraph
 	})
 
+	// Reuse and retrieval are both decided once, before any model call.
+	const locales = { source: sourceLocale, target: targetLocale }
+	const plan = await planParagraphs(paragraphs, await loadMemory(), locales)
+
 	const localizedParagraphs: string[] = []
 
 	// Process in parallel batches
@@ -183,19 +191,19 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 			return { success: false }
 		}
 
-		const batch = paragraphs.slice(i, i + PROCESSING_CONCURRENCY)
-
-		// Replace {text} placeholder with actual paragraph (simple string operation per paragraph)
-		const contents = batch.map((p) => basePrompt.replace('{text}', p))
+		const batch = plan.slice(i, i + PROCESSING_CONCURRENCY)
 
 		const results = await Promise.all(
-			contents.map((content) =>
-				processParagraph({
+			batch.map(async (step, offset) => {
+				if (step.translation !== null) return step.translation
+
+				const content = basePrompt.replace('{text}', paragraphs[i + offset])
+				return await processParagraph({
 					apiUrl,
 					model,
-					content,
+					content: step.context ? `${step.context}\n${content}` : content,
 				})
-			)
+			})
 		)
 
 		localizedParagraphs.push(...results)
@@ -220,6 +228,86 @@ export async function processDocument(options: ProcessingOptions): Promise<Proce
 		localizedText: finalText,
 		markdown,
 		paragraphsProcessed: paragraphs.length,
+	}
+}
+
+/**
+ * Loads approved memory once. Returns an empty list when unavailable so the
+ * document still translates.
+ */
+async function loadMemory(): Promise<MemoryEntry[]> {
+	try {
+		const loaded = await window.electron.loadMemory()
+		return Array.isArray(loaded) ? (loaded as MemoryEntry[]) : []
+	} catch {
+		return []
+	}
+}
+
+/**
+ * Decides, for every paragraph, whether an approved translation can be reused
+ * or the paragraph must be sent to the model.
+ *
+ * All paragraphs are embedded in one batched call, and a paragraph covered by
+ * an approved translation never reaches the model at all.
+ */
+async function planParagraphs(
+	paragraphs: string[],
+	memory: MemoryEntry[],
+	locales: { source: string; target: string }
+): Promise<Array<{ translation: string | null; context: string }>> {
+	if (memory.length === 0) {
+		return paragraphs.map(() => ({ translation: null, context: '' }))
+	}
+
+	const vectors = await embedTexts(paragraphs)
+
+	return paragraphs.map((paragraph, index) => {
+		const approved = findReusableTranslation(paragraph, memory, locales)
+		if (approved) return { translation: approved, context: '' }
+
+		const vector = vectors[index]
+		const matches =
+			vector && vector.length > 0
+				? findSimilar(vector, memory, MEMORY_SIMILARITY_THRESHOLD, MEMORY_MATCH_LIMIT, locales)
+				: []
+
+		return { translation: null, context: buildMemoryContext(matches, locales.target) }
+	})
+}
+
+/**
+ * Records an approved document into translation memory.
+ * Failures are swallowed: approving a document must never fail on the memory write.
+ */
+export async function recordApprovedDocument(args: {
+	documentId: string
+	sourceText: string
+	translatedText: string
+	sourceLocale: string
+	targetLocale: string
+}): Promise<MemoryEntry[]> {
+	try {
+		const paragraphs = splitParagraphs(args.sourceText)
+		const vectors = await embedTexts(paragraphs)
+		if (vectors.length === 0) return []
+
+		const entries = buildMemoryEntries({
+			documentId: args.documentId,
+			sourceText: args.sourceText,
+			translatedText: args.translatedText,
+			sourceLocale: args.sourceLocale,
+			targetLocale: args.targetLocale,
+			embeddings: vectors,
+			approvedAt: new Date().toISOString(),
+		})
+		if (entries.length === 0) return []
+
+		const existing = (await window.electron.loadMemory()) as MemoryEntry[]
+		await window.electron.saveMemory([...(Array.isArray(existing) ? existing : []), ...entries])
+		return entries
+	} catch {
+		return []
 	}
 }
 

@@ -26,6 +26,12 @@ contextBridge.exposeInMainWorld('electron', {
 
 	generateAI: (options: { url: string; body: object }) => ipcRenderer.invoke('ai:generate', options),
 
+	embedText: (input: string[]) => ipcRenderer.invoke('ai:embed', input),
+
+	loadMemory: () => ipcRenderer.invoke('memory:load'),
+
+	saveMemory: (entries: object[]) => ipcRenderer.invoke('memory:save', entries),
+
 	loadSettings: () => ipcRenderer.invoke('settings:load'),
 
 	saveSettings: (settings: object) => ipcRenderer.invoke('settings:save', settings),

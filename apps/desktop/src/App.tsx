@@ -11,7 +11,7 @@ import SettingsModal from './components/SettingsModal'
 import { useDocuments } from './hooks/useDocuments'
 import { contentToDocx, contentToPdf, ExportFormat, getFileExtension } from './lib/export'
 import { ALL_LOCALES } from './lib/locales'
-import { createProcessingOutput, extractMarkdown, processDocument } from './lib/processing'
+import { createProcessingOutput, extractMarkdown, processDocument, recordApprovedDocument } from './lib/processing'
 import { LOCALE_DETECTION_PROMPT } from './lib/prompts'
 import { loadSettings } from './lib/settings'
 import type { HistoryEntry, Settings } from './lib/types'
@@ -417,6 +417,18 @@ export default function App() {
 	const handleApprove = useCallback(async () => {
 		const output = tasksDocs.find((d) => d.id === selectedOutputId)
 		if (!output) return
+
+		// Record approved translations before the task leaves state, so the
+		// source/target text is still available for embedding.
+		if (output.markdown && output.localizedText) {
+			await recordApprovedDocument({
+				documentId: output.id,
+				sourceText: output.markdown,
+				translatedText: output.localizedText,
+				sourceLocale: output.sourceLocale,
+				targetLocale: output.targetLocale,
+			})
+		}
 
 		setTasksDocs((prev) => prev.filter((d) => d.id !== selectedOutputId))
 		setProcessedDocs((prev) => [...prev, { ...output, status: 'approved' as const }])

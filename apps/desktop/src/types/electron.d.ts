@@ -19,6 +19,9 @@ export interface ElectronAPI {
 		url: string
 		body: object
 	}) => Promise<{ content: string; error?: string; status?: number }>
+	embedText: (input: string[]) => Promise<{ vectors?: number[][]; error?: string }>
+	loadMemory: () => Promise<unknown[]>
+	saveMemory: (entries: object[]) => Promise<boolean>
 	loadSettings: () => Promise<unknown>
 	saveSettings: (settings: object) => Promise<boolean>
 	getHistory: () => Promise<unknown[]>

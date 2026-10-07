@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { app, BrowserWindow, dialog, ipcMain, net } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { embed, registerEmbedderShutdown } from './embedder'
 
 // For dev logging
 const DEBUG = true
@@ -137,6 +138,7 @@ function createWindow() {
 app.whenReady().then(() => {
 	createWindow()
 	setupAutoUpdater()
+	registerEmbedderShutdown()
 	checkForUpdates()
 
 	app.on('activate', () => {
@@ -519,6 +521,72 @@ ipcMain.handle('prompts:delete', async (_event, filename: string) => {
 		return true
 	} catch (e) {
 		log('Error deleting prompt:', e)
+		return false
+	}
+})
+
+// Embeddings for translation-memory retrieval.
+// Runs in a worker thread, so this handler stays non-blocking.
+ipcMain.handle('ai:embed', async (_event, input: string[]): Promise<{ vectors?: number[][]; error?: string }> => {
+	if (!Array.isArray(input) || input.length === 0) {
+		return { vectors: [] }
+	}
+
+	log('ai:embed called, inputs:', input.length)
+
+	try {
+		const vectors = await embed(input)
+		log('ai:embed produced', vectors.length, 'vectors')
+		return { vectors }
+	} catch (e) {
+		const message = e instanceof Error ? e.message : String(e)
+		log('ai:embed error:', message)
+		return { error: message }
+	}
+})
+
+// Translation memory persistence (approved source/target pairs + embeddings)
+const memoryFilePath = path.join(app.getPath('userData'), 'memory.json')
+const MAX_MEMORY_ENTRIES = 5000
+
+interface StoredMemoryEntry {
+	id: string
+	documentId: string
+	sourceText: string
+	translation: string
+	sourceLocale: string
+	targetLocale: string
+	embedding: number[]
+	approvedAt: string
+}
+
+ipcMain.handle('memory:load', async () => {
+	try {
+		ensureUserDataDir()
+		if (fs.existsSync(memoryFilePath)) {
+			return JSON.parse(fs.readFileSync(memoryFilePath, 'utf-8'))
+		}
+	} catch (e) {
+		log('Error loading memory:', e)
+	}
+	return []
+})
+
+ipcMain.handle('memory:save', async (_event, entries: StoredMemoryEntry[]) => {
+	try {
+		ensureUserDataDir()
+		const existing = fs.existsSync(memoryFilePath)
+			? (JSON.parse(fs.readFileSync(memoryFilePath, 'utf-8')) as StoredMemoryEntry[])
+			: []
+
+		// Replace this document's entries, then append and cap.
+		const documentIds = new Set(entries.map((entry) => entry.documentId))
+		const merged = [...existing.filter((entry) => !documentIds.has(entry.documentId)), ...entries]
+
+		fs.writeFileSync(memoryFilePath, JSON.stringify(merged.slice(-MAX_MEMORY_ENTRIES), null, 2), 'utf-8')
+		return true
+	} catch (e) {
+		log('Error saving memory:', e)
 		return false
 	}
 })
