@@ -1,21 +1,7 @@
 # Project Memory
 
-Short, hand-curated facts the model should keep in mind on every session.
-Real rules live in `.factory/rules/`. This file is the index + project-specific
-nuggets that don't deserve a full rule file.
-
-Cross-project personal memory lives in `~/.factory/memories.md` and is
-injected automatically on session start.
-
-## Active Constraints
-
-See `.factory/rules/` for the canonical rules. This file only adds
-project-specific constraints that don't yet deserve a full rule file.
-
-- All hooks in this repo are wired in `.factory/settings.json` and
-  `~/.factory/settings.json` (user-level). Universal hooks (SessionStart,
-  UserPromptSubmit, Stop) are inherited from user level via Factory's
-  extension-only merge.
+Hand-curated facts specific to Najimu. Cross-project rules and skills live in
+`~/.agents`, not here.
 
 ## Known Stale Knowledge
 
@@ -29,8 +15,8 @@ project-specific constraints that don't yet deserve a full rule file.
 
 - 2026-10-07 — Translation memory runs EmbeddingGemma 2 **in-process** via
   `@huggingface/transformers` in a `worker_threads` worker
-  (`apps/desktop/electron/embedder/`). The user's constraint: no extra server
-  for the user to start, and no blocking of Electron. This is why there are no
+  (`apps/desktop/electron/embedder/`). The constraint: no extra server for the
+  user to start, and no blocking of Electron. This is why there are no
   embedding settings and no embedding URL — those were tried and rejected.
 - 2026-10-07 — `onnxruntime-node` is set to `allowBuilds: false` because its
   Darwin/Linux/Win binaries ship inside the tarball; only the postinstall
@@ -43,3 +29,12 @@ project-specific constraints that don't yet deserve a full rule file.
 - 2026-10-07 — Upgraded vitest 4 → 5 at root and in `packages/core`. Note
   `--reporter=basic` was removed upstream in v5; use the default reporter.
   v5 defaults `clearMocks: true`.
+- 2026-10-07 — Renamed the project from `document-localizer` to **Najimu**
+  (馴染む, "to fit in"). The landing site is `najimu.zimablue.io`. Landing URLs
+  are declared once in `apps/landing/.env.example` (`VITE_SITE_URL`,
+  `VITE_REPO_URL`) and resolved at build time; there is no second config file
+  holding the same values.
+- 2026-10-07 — `apps/landing` is typechecked with its own `tsc --noEmit`; its
+  tsconfig covers `src`, `tests`, and `scripts`. The desktop tsconfig still
+  covers only `src`, because adding its `tests` surfaces pre-existing errors in
+  `tests/lib/similarity.test.ts`.

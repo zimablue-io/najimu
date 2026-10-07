@@ -43,12 +43,11 @@ packages/core/src/
 
 ## Key Constraints
 
-1. **Don't commit directly to main** - use feature branches, PRs
-2. **Run tests before finishing**: `pnpm test`
-3. **Use Biome for formatting**: `pnpm lint:fix`
-4. **Settings stored in JSON files** - no database, no conf library
-5. **All file ops go through IPC** - renderer has no direct fs access
-6. **Test-first for bugs/features**: When fixing bugs or implementing features, write tests that FAIL before the fix, then PASS after. This prevents regressions and proves the fix works. Never claim "done" without tests verifying the behavior.
+1. **Run tests before finishing**: `pnpm test`
+2. **Use Biome for formatting**: `pnpm lint:fix`
+3. **Settings stored in JSON files** - no database, no conf library
+4. **All file ops go through IPC** - renderer has no direct fs access
+5. **Test-first for bugs/features**: When fixing bugs or implementing features, write tests that FAIL before the fix, then PASS after. This prevents regressions and proves the fix works. Never claim "done" without tests verifying the behavior.
 
 ## Standard Commands
 
@@ -98,39 +97,7 @@ Do not manually bump versions. See `docs/RELEASES.md` for full release process d
 - For architecture: see `AGENTS.md` architecture section
 - For patterns: check `biome.json` for formatting rules
 
-<!-- BEGIN:personal-memory-section -->
+## Agent Notes
 
-## Personal Memory
-
-Personal preferences, capture philosophy, and coding style live in
-`~/.factory/memories.md` (cross-project). It is injected automatically
-on session start by `~/.factory/scripts/session-init.sh`. This file
-holds ONLY project-specific facts.
-
-<!-- END:personal-memory-section -->
-
-<!-- BEGIN:proactive-capture-section -->
-
-## Proactive Memory Capture
-
-The agent drives capture proactively. It must:
-
-1. After any rule violation (e.g., re-introducing a forbidden pattern,
-   reverting a refactor) — write a dated note to `.factory/memories.md`
-   under `## Active Constraints` and (if pattern) append to the rule's
-   `### Observed (auto-logged)` section.
-
-2. After a non-obvious WHY surfaces in conversation (e.g., a design
-   decision explained) — write a dated note to `.factory/memories.md`
-   under `## Past Decisions`.
-
-3. After discovering the user repeatedly has to correct the same
-   thing — promote it to a rule under `.factory/rules/<name>.md` and
-   add the pattern to `rule-patterns.json` (run `just rules-compile`).
-
-`/remember` and manual capture hooks are FORBIDDEN — by the time the
-user thinks to trigger them, the moment has passed. Frustration
-signals (`.factory/logs/frustration/`) are the FAILURE signal, not
-the trigger.
-
-<!-- END:proactive-capture-section -->
+Project-specific facts for coding agents live in `.agents/memories.md`.
+Cross-project preferences and rules live in `~/.agents`.

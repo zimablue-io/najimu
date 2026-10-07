@@ -43,3 +43,6 @@ apps/landing/public/manifest.webmanifest
 dist/
 apps/desktop/dist/
 apps/desktop/dist-electron/
+
+# Agent harness scratch (machine-local)
+.factory/
