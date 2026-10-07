@@ -8,15 +8,16 @@ Shared business logic for document localization. Browser-compatible (no Node.js 
 
 ```
 packages/core/src/
+├── index.ts               # Public barrel export
+├── types.ts               # Shared TypeScript interfaces
 ├── services/
-│   ├── openai-client.ts    # LLM API calls (OpenAI-compatible)
-│   ├── file-processor.ts   # PDF/MD parsing
-│   ├── localize.ts         # Localization logic
-│   └── diff.ts             # Change detection
+│   ├── openai-client.ts     # LLM API calls (OpenAI-compatible)
+│   ├── file-processor.ts    # PDF/MD parsing
+│   ├── pdf.ts               # PDF to markdown conversion (DocuText)
+│   ├── localize.ts          # Localization logic
+│   └── process-document.ts  # Single-document parse + localize pipeline
 └── utils/
-    ├── chunk.ts            # Text chunking
-    ├── chunk-manager.ts     # Chunk state management
-    └── change-detection.ts  # Diff algorithms
+    └── chunk.ts             # Text chunking
 ```
 
 ## Key Services
@@ -27,7 +28,7 @@ packages/core/src/
 - Handles streaming responses
 
 ### file-processor
-- PDF parsing via pdfjs-dist
+- PDF parsing via docutext/browser
 - Markdown parsing (simple split)
 - Returns plain text for localization
 

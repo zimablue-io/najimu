@@ -34,10 +34,11 @@ apps/desktop/src/
 
 apps/desktop/electron/
 ├── main.ts              # Electron main process, IPC handlers
-└── preload.ts           # Context bridge
+├── preload.ts           # Context bridge
+└── embedder/            # EmbeddingGemma 2 worker thread (translation memory)
 
 packages/core/src/
-└── services/            # openai-client, file-processor, localize, diff
+└── services/            # openai-client, file-processor, pdf, localize, process-document
 ```
 
 ## Key Constraints
@@ -66,9 +67,16 @@ pnpm lint:fix             # Format and lint
 **Desktop App**: Three-tab system (Uploaded → Tasks → Processed)
 - User uploads PDF/.md files
 - Selects locales, clicks Process
-- AI localizes chunks via local LLM
+- Approved translations are retrieved from translation memory as terminology examples
+- AI localizes paragraphs via local LLM
 - User reviews in diff view, approves/rejects
+- Approving records the translation into memory
 - Exports approved as Markdown or PDF
+
+**Translation Memory**: EmbeddingGemma 2 runs in-process in a worker thread
+- No embedding server, no configuration, no extra model for the user to start
+- Model weights download once and cache under Electron `userData/models`
+- If embeddings fail, translation continues without memory
 
 **Landing Page**: Marketing site at zimablue-io.github.io/document-localizer
 - Hero with animated demo
