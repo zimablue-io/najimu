@@ -18,18 +18,6 @@ export interface LocalizationResult {
 	changesCount?: number
 }
 
-export interface DiffArtifact {
-	diffMarkdown: string
-	summaryMarkdown: string
-	summaryJson: string
-	patchText: string
-}
-
-export interface DiffLine {
-	type: 'added' | 'removed' | 'unchanged'
-	content: string
-}
-
 // Document processing types
 export type DocumentStatus = 'idle' | 'parsing' | 'localizing' | 'review' | 'approved' | 'exported' | 'error'
 

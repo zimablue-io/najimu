@@ -1,4 +1,3 @@
-export * from './services/diff'
 export * from './services/file-processor'
 export * from './services/localize'
 export * from './services/pdf'

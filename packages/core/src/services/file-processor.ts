@@ -33,7 +33,7 @@ export function getMdFilePath(sourcePath: string): string {
  *
  * @param input - Document to process (id, path, name)
  * @param callbacks - Progress and status callbacks
- * @param parsePdfFn - Platform-specific PDF parsing function (e.g., Tauri invoke)
+ * @param parsePdfFn - Platform-specific PDF parsing function supplied by the caller
  * @param readFileFn - Platform-specific file reading function for .md files
  * @param writeFileFn - Platform-specific file writing function to save .md files
  * @param aiClient - AI client for localization

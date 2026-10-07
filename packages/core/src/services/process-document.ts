@@ -7,7 +7,7 @@ import { OpenAIClient } from './openai-client'
  *
  * @param input - Document to process (id, path, name)
  * @param callbacks - Progress and status callbacks
- * @param parsePdfFn - Platform-specific PDF parsing function (e.g., Tauri invoke)
+ * @param parsePdfFn - Platform-specific PDF parsing function supplied by the caller
  * @param aiClient - AI client for localization
  * @param config - Processing configuration
  */
