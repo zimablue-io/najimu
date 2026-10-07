@@ -6,6 +6,7 @@ export default defineConfig({
 			'apps/desktop/tests/**/*.test.ts',
 			'apps/landing/tests/**/*.test.ts',
 			'apps/landing/tests/**/*.test.tsx',
+			'packages/core/src/**/__tests__/**/*.test.ts',
 		],
 		environment: 'node',
 		alias: {

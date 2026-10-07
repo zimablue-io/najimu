@@ -9,9 +9,10 @@
     "apps/desktop/electron/**"
   ],
   
-  // Used in electron main process (ignored above)
+  // Used only in the electron main process (which is ignored above)
   "ignoreDependencies": [
-    "electron-updater"
+    "electron-updater",
+    "@huggingface/transformers"
   ],
   
   // Exports and types have too many false positives in this codebase

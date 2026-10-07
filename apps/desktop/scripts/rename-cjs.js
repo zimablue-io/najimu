@@ -22,8 +22,12 @@ if (fs.existsSync(preloadJs)) {
 // Update main.cjs to reference preload.cjs instead of preload.js
 const mainPath = path.join(distDir, 'main.cjs')
 if (fs.existsSync(mainPath)) {
-	let content = fs.readFileSync(mainPath, 'utf-8')
-	content = content.replace(/preload\.js/g, 'preload.cjs')
-	fs.writeFileSync(mainPath, content)
-	console.log('Updated preload reference in main.cjs')
+	const content = fs.readFileSync(mainPath, 'utf-8')
+	// main.ts already references preload.cjs, so this is a no-op guard for
+	// any source that still names preload.js.
+	const updated = content.replace(/preload\.js/g, 'preload.cjs')
+	if (updated !== content) {
+		fs.writeFileSync(mainPath, updated)
+		console.log('Updated preload reference in main.cjs')
+	}
 }

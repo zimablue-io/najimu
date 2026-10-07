@@ -14,11 +14,10 @@
     "./scroll-area": "./src/components/ui/scroll-area.tsx",
     "./select": "./src/components/ui/select.tsx",
     "./tabs": "./src/components/ui/tabs.tsx",
-    "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./components/*": "./src/components/*.tsx"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf dist && tsc"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

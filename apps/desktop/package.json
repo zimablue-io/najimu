@@ -17,6 +17,9 @@
       "dist/**/*",
       "dist-electron/**/*"
     ],
+    "asarUnpack": [
+      "**/node_modules/onnxruntime-node/bin/**"
+    ],
     "mac": {
       "target": [
         "dmg"
@@ -35,22 +38,22 @@
     }
   },
   "scripts": {
-    "dev": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && concurrently \"vite\" \"tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron .\"",
+    "dev": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && concurrently \"vite\" \"node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron .\"",
     "dev:web": "vite",
-    "build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js",
+    "build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js",
     "preview": "vite preview",
-    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder"
+    "electron:build": "pnpm --filter @doclocalizer/core build && pnpm --filter @doclocalizer/ui build && tsc --noEmit && vite build && node scripts/clean-electron.js && tsc -p tsconfig.electron.json && node scripts/rename-cjs.js && electron-builder"
   },
   "dependencies": {
     "@doclocalizer/core": "workspace:*",
     "@doclocalizer/ui": "workspace:*",
+    "@huggingface/transformers": "4.3.1",
     "@mohtasham/md-to-docx": "^2.10.1",
     "date-fns": "^4.1.0",
     "diff": "^9.0.0",
     "electron-updater": "^6.3.9",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.8.0",
-    "ms": "^2.1.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sonner": "^1.7.4"

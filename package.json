@@ -6,12 +6,8 @@
 	"type": "module",
 	"description": "Document localization with AI",
 	"license": "SEE LICENSE IN LICENSE.md",
-	"workspaces": [
-		"packages/*",
-		"apps/*"
-	],
 	"scripts": {
-		"dev:desktop": "pnpm --filter @doclocalizer/desktop tauri dev",
+		"dev:desktop": "pnpm --filter @doclocalizer/desktop dev",
 		"dev:landing": "pnpm --filter @doclocalizer/landing dev",
 		"build:core": "pnpm --filter @doclocalizer/core build",
 		"build:desktop": "pnpm --filter @doclocalizer/desktop build",
@@ -29,8 +25,7 @@
 		"@types/node": "^22.15.3",
 		"husky": "^9.1.7",
 		"knip": "^6.7.0",
-		"release-please": "^17.0.0",
 		"typescript": "^5.8.3",
-		"vitest": "^4.1.4"
+		"vitest": "^5.0.3"
 	}
 }

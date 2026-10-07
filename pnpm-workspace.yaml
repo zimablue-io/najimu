@@ -3,5 +3,12 @@ packages:
   - apps/*
 
 allowBuilds:
-  electron: false
+  electron: true
   electron-winstaller: false
+  # Native binaries ship inside the onnxruntime-node tarball, so its
+  # postinstall download is unnecessary and must not run.
+  onnxruntime-node: false
+  protobufjs: false
+
+minimumReleaseAgeExclude:
+  - '@huggingface/transformers@4.3.1'
